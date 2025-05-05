@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	:root {
+		--background: 55 30% 92.16%;
+		--foreground: 15.65 15.44% 29.22%;
+		--card: 55 30% 92.16%;
+		--card-foreground: 15.65 15.44% 29.22%;
+		--popover: 0 0% 100%;
+		--popover-foreground: 15.65 15.44% 29.22%;
+		--primary: 18.1 25.51% 51.57%;
+		--primary-foreground: 0 0% 100%;
+		--secondary: 37.5 22.47% 65.1%;
+		--secondary-foreground: 0 0% 100%;
+		--muted: 20.45 44.9% 80.78%;
+		--muted-foreground: 13.75 21.05% 44.71%;
+		--accent: 20.45 44.9% 80.78%;
+		--accent-foreground: 15.65 15.44% 29.22%;
+		--destructive: 22.5 14.81% 10.59%;
+		--destructive-foreground: 0 0% 100%;
+		--border: 37.5 22.47% 65.1%;
+		--input: 37.5 22.47% 65.1%;
+		--ring: 18.1 25.51% 51.57%;
+		--chart-1: 18.1 25.51% 51.57%;
+		--chart-2: 13.75 21.05% 44.71%;
+		--chart-3: 22.37 32.96% 64.9%;
+		--chart-4: 37.5 22.47% 65.1%;
+		--chart-5: 22.33 18.78% 55.1%;
+		--sidebar: 20.63 44.44% 85.88%;
+		--sidebar-foreground: 15.65 15.44% 29.22%;
+		--sidebar-primary: 18.1 25.51% 51.57%;
+		--sidebar-primary-foreground: 0 0% 100%;
+		--sidebar-accent: 22.37 32.96% 64.9%;
+		--sidebar-accent-foreground: 0 0% 100%;
+		--sidebar-border: 22.33 18.78% 55.1%;
+		--sidebar-ring: 18.1 25.51% 51.57%;
+		--font-sans: DM Sans, sans-serif;
+		--font-serif: Georgia, serif;
+		--font-mono: Menlo, monospace;
+		--radius: 0.5rem;
+		--shadow-2xs: 2px 2px 0px 0px hsl(20 18% 51% / 0.06);
+		--shadow-xs: 2px 2px 0px 0px hsl(20 18% 51% / 0.06);
+		--shadow-sm: 2px 2px 0px 0px hsl(20 18% 51% / 0.11), 2px 1px 2px -1px hsl(20 18% 51% / 0.11);
+		--shadow: 2px 2px 0px 0px hsl(20 18% 51% / 0.11), 2px 1px 2px -1px hsl(20 18% 51% / 0.11);
+		--shadow-md: 2px 2px 0px 0px hsl(20 18% 51% / 0.11), 2px 2px 4px -1px hsl(20 18% 51% / 0.11);
+		--shadow-lg: 2px 2px 0px 0px hsl(20 18% 51% / 0.11), 2px 4px 6px -1px hsl(20 18% 51% / 0.11);
+		--shadow-xl: 2px 2px 0px 0px hsl(20 18% 51% / 0.11), 2px 8px 10px -1px hsl(20 18% 51% / 0.11);
+		--shadow-2xl: 2px 2px 0px 0px hsl(20 18% 51% / 0.28);
+	}
+
+	.dark {
+		--background: 20 15.38% 15.29%;
+		--foreground: 55 30% 92.16%;
+		--card: 21.43 13.21% 20.78%;
+		--card-foreground: 55 30% 92.16%;
+		--popover: 21.43 13.21% 20.78%;
+		--popover-foreground: 55 30% 92.16%;
+		--primary: 22.37 32.96% 64.9%;
+		--primary-foreground: 20 15.38% 15.29%;
+		--secondary: 13.75 21.05% 44.71%;
+		--secondary-foreground: 55 30% 92.16%;
+		--muted: 15.65 15.44% 29.22%;
+		--muted-foreground: 21.43 26.58% 69.02%;
+		--accent: 37.5 22.47% 65.1%;
+		--accent-foreground: 20 15.38% 15.29%;
+		--destructive: 0 68.67% 67.45%;
+		--destructive-foreground: 20 15.38% 15.29%;
+		--border: 15.65 15.44% 29.22%;
+		--input: 15.65 15.44% 29.22%;
+		--ring: 22.37 32.96% 64.9%;
+		--chart-1: 22.37 32.96% 64.9%;
+		--chart-2: 37.5 22.47% 65.1%;
+		--chart-3: 18.1 25.51% 51.57%;
+		--chart-4: 13.75 21.05% 44.71%;
+		--chart-5: 22.33 18.78% 55.1%;
+		--sidebar: 22.5 14.81% 10.59%;
+		--sidebar-foreground: 55 30% 92.16%;
+		--sidebar-primary: 22.37 32.96% 64.9%;
+		--sidebar-primary-foreground: 22.5 14.81% 10.59%;
+		--sidebar-accent: 37.5 22.47% 65.1%;
+		--sidebar-accent-foreground: 22.5 14.81% 10.59%;
+		--sidebar-border: 15.65 15.44% 29.22%;
+		--sidebar-ring: 22.37 32.96% 64.9%;
+		--font-sans: DM Sans, sans-serif;
+		--font-serif: Georgia, serif;
+		--font-mono: Menlo, monospace;
+		--radius: 0.5rem;
+		--shadow-2xs: 2px 2px 0px 0px hsl(20 18% 30% / 0.06);
+		--shadow-xs: 2px 2px 0px 0px hsl(20 18% 30% / 0.06);
+		--shadow-sm: 2px 2px 0px 0px hsl(20 18% 30% / 0.11), 2px 1px 2px -1px hsl(20 18% 30% / 0.11);
+		--shadow: 2px 2px 0px 0px hsl(20 18% 30% / 0.11), 2px 1px 2px -1px hsl(20 18% 30% / 0.11);
+		--shadow-md: 2px 2px 0px 0px hsl(20 18% 30% / 0.11), 2px 2px 4px -1px hsl(20 18% 30% / 0.11);
+		--shadow-lg: 2px 2px 0px 0px hsl(20 18% 30% / 0.11), 2px 4px 6px -1px hsl(20 18% 30% / 0.11);
+		--shadow-xl: 2px 2px 0px 0px hsl(20 18% 30% / 0.11), 2px 8px 10px -1px hsl(20 18% 30% / 0.11);
+		--shadow-2xl: 2px 2px 0px 0px hsl(20 18% 30% / 0.28);
+	}
+}
+
+@layer base {
+	* {
+		@apply border-border;
+	}
+	body {
+		@apply bg-background text-foreground;
+	}
+}
