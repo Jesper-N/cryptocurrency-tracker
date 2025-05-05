@@ -1,6 +1,6 @@
 # Cryptocurrency Tracker
 
-A cryptocurrency tracker built with SvelteKit, Svelte, and TypeScript. It uses the CoinMarketCap API to fetch near real-time cryptocurrency data. The UI is similar to the official CoinMarketCap website.
+A cryptocurrency tracker built with SvelteKit, Svelte, TypeScript, PostgreSQL and Shadcn-svelte. It uses the CoinMarketCap API to fetch near real-time cryptocurrency data. The UI is similar to the official CoinMarketCap website.
 
 ## Install dependencies
 
