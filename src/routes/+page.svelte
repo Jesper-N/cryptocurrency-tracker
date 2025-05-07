@@ -259,16 +259,16 @@
 				<Table.Root>
 					<Table.Header>
 						<Table.Row>
-							<Table.Head class="w-[50px] text-center">#</Table.Head>
+							<Table.Head>#</Table.Head>
 							<Table.Head>Name</Table.Head>
-							<Table.Head class="text-right">Price</Table.Head>
-							<Table.Head class="text-right">1h %</Table.Head>
-							<Table.Head class="text-right">24h %</Table.Head>
-							<Table.Head class="text-right">7d %</Table.Head>
-							<Table.Head class="text-right">Market Cap</Table.Head>
-							<Table.Head class="text-right">Volume(24h)</Table.Head>
-							<Table.Head class="text-right">Circulating Supply</Table.Head>
-							<Table.Head class="w-[150px] text-center">Last Hour</Table.Head>
+							<Table.Head>Price</Table.Head>
+							<Table.Head>1h %</Table.Head>
+							<Table.Head>24h %</Table.Head>
+							<Table.Head>7d %</Table.Head>
+							<Table.Head>Market Cap</Table.Head>
+							<Table.Head>Volume(24h)</Table.Head>
+							<Table.Head>Circulating Supply</Table.Head>
+							<Table.Head>Last Hour</Table.Head>
 						</Table.Row>
 					</Table.Header>
 					<Table.Body>
@@ -297,11 +297,11 @@
 								class="hover:cursor-pointer"
 								onclick={() => goto(`/currencies/${coin.slug}`)}
 							>
-								<Table.Cell class="text-center font-medium">{coin.cmcRank}</Table.Cell>
+								<Table.Cell class="font-medium">{coin.cmcRank}</Table.Cell>
 								<Table.Cell>
 									{coin.name} <span class="text-muted-foreground">{coin.symbol}</span>
 								</Table.Cell>
-								<Table.Cell class="text-right font-medium">
+								<Table.Cell class="font-medium">
 									{#if isVerySmallPrice}
 										${priceNum.toFixed(pricePrecision)}
 									{:else}
@@ -317,29 +317,23 @@
 									{/if}
 								</Table.Cell>
 								<Table.Cell
-									class="text-right {parseFloat(coin.percentChange1h) >= 0
-										? 'text-green-600'
-										: 'text-red-600'}"
+									class={parseFloat(coin.percentChange1h) >= 0 ? 'text-green-600' : 'text-red-600'}
 								>
 									{formatPercentage(coin.percentChange1h)}
 								</Table.Cell>
 								<Table.Cell
-									class="text-right {parseFloat(coin.percentChange24h) >= 0
-										? 'text-green-600'
-										: 'text-red-600'}"
+									class={parseFloat(coin.percentChange24h) >= 0 ? 'text-green-600' : 'text-red-600'}
 								>
 									{formatPercentage(coin.percentChange24h)}
 								</Table.Cell>
 								<Table.Cell
-									class="text-right {parseFloat(coin.percentChange7d) >= 0
-										? 'text-green-600'
-										: 'text-red-600'}"
+									class={parseFloat(coin.percentChange7d) >= 0 ? 'text-green-600' : 'text-red-600'}
 								>
 									{formatPercentage(coin.percentChange7d)}
 								</Table.Cell>
-								<Table.Cell class="text-right">{formatLargeCurrency(coin.marketCap)}</Table.Cell>
-								<Table.Cell class="text-right">{formatLargeCurrency(coin.volume24h)}</Table.Cell>
-								<Table.Cell class="text-right"
+								<Table.Cell>{formatLargeCurrency(coin.marketCap)}</Table.Cell>
+								<Table.Cell>{formatLargeCurrency(coin.volume24h)}</Table.Cell>
+								<Table.Cell
 									>{formatSupply(coin.circulatingSupply)}
 									<span class="ml-1 text-muted-foreground">{coin.symbol}</span></Table.Cell
 								>
@@ -355,7 +349,10 @@
 												padding={{ top: 2, bottom: 2, left: 1, right: 1 }}
 											>
 												<Svg>
-													<Spline class="{chartColorClass} animate-draw-line stroke-2" />
+													<Spline 
+														class="{chartColorClass} animate-draw-line stroke-2"
+														style="transform: translateZ(0); will-change: transform;"
+													/>
 												</Svg>
 											</Chart>
 										</div>
@@ -386,6 +383,8 @@
 		stroke-dasharray: 1000;
 		stroke-dashoffset: 1000;
 		animation: drawLine 1.1s ease-in-out forwards;
+		transform: translateZ(0);
+		will-change: stroke-dashoffset;
 	}
 
 	@keyframes drawLine {
