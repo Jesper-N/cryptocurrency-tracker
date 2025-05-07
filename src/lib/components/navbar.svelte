@@ -5,32 +5,41 @@
 	import { buttonVariants } from '$lib/components/ui/button/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 
-	// Logo animation properties
-	let logoColor = 'currentColor';
-	let logoSize = 26;
-	let logoStrokeWidth = 2;
+	// Logo constants
+	const LOGO_CONFIG = {
+		color: 'currentColor',
+		size: 26,
+		strokeWidth: 2,
+		animationDuration: 700,
+		debounceDelay: 100
+	} as const;
+
 	let shouldAnimate = $state(false);
+	let animationTimer: ReturnType<typeof setTimeout>;
+	let debounceTimer: ReturnType<typeof setTimeout>;
 
-	// Animation function for logo
+	// Animation function with debounce
 	function animateLogo() {
-		shouldAnimate = true;
-		setTimeout(() => {
-			shouldAnimate = false;
-		}, 700);
+		// Clear any existing animation timer
+		clearTimeout(animationTimer);
+		clearTimeout(debounceTimer);
+
+		// Debounce the animation start
+		debounceTimer = setTimeout(() => {
+			shouldAnimate = true;
+			animationTimer = setTimeout(() => {
+				shouldAnimate = false;
+			}, LOGO_CONFIG.animationDuration);
+		}, LOGO_CONFIG.debounceDelay);
 	}
 
-	// For hover effect
-	function handleMouseEnter() {
-		animateLogo();
-	}
-
+	// Initial animation
 	$effect(() => {
-		const timer = setTimeout(() => {
-			animateLogo();
-		}, 1);
-
-		// Cleanup function
-		return () => clearTimeout(timer);
+		animateLogo();
+		return () => {
+			clearTimeout(animationTimer);
+			clearTimeout(debounceTimer);
+		};
 	});
 </script>
 
@@ -41,20 +50,22 @@
 				class="mr-3 cursor-pointer"
 				aria-label="chart-line"
 				role="img"
-				onmouseenter={handleMouseEnter}
+				onmouseenter={animateLogo}
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
-					width={logoSize}
-					height={logoSize}
+					width={LOGO_CONFIG.size}
+					height={LOGO_CONFIG.size}
 					viewBox="0 0 24 24"
 					fill="none"
-					stroke={logoColor}
-					stroke-width={logoStrokeWidth}
+					stroke={LOGO_CONFIG.color}
+					stroke-width={LOGO_CONFIG.strokeWidth}
 					stroke-linecap="round"
 					stroke-linejoin="round"
 					class="chart-line-icon transition-transform hover:scale-105"
 					class:animate={shouldAnimate}
+					aria-hidden="true"
+					focusable="false"
 				>
 					<path d="M3 3v16a2 2 0 0 0 2 2h16" class="frame" />
 					<path d="m7 13 3-3 4 4 5-5" class="line" />
@@ -110,9 +121,9 @@
 </div>
 
 <style>
-	/* These animations can't be easily done with Tailwind alone */
 	.chart-line-icon {
 		overflow: visible;
+		will-change: transform;
 	}
 
 	.line {
@@ -121,10 +132,13 @@
 		transition:
 			stroke-dashoffset 0.3s ease,
 			opacity 0.3s ease;
+		transform: translateZ(0);
+		will-change: stroke-dashoffset, opacity;
 	}
 
 	.chart-line-icon.animate .line {
 		animation: lineAnimation 0.6s ease backwards;
+		animation-fill-mode: forwards;
 	}
 
 	@keyframes lineAnimation {
