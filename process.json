@@ -1,0 +1,20 @@
+{
+	"apps": [
+		{
+			"name": "cryptocurrency-tracker-server",
+			"script": "./build/index.js",
+			"instances": "max",
+			"exec_mode": "fork",
+			"env": {
+				"NODE_ENV": "production",
+				"PORT": 3000,
+				"DATABASE_URL": "",
+				"CMC_API_KEY": ""
+			},
+			"watch": false,
+			"env_production": {
+				"NODE_ENV": "production"
+			}
+		}
+	]
+}
