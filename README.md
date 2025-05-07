@@ -5,21 +5,25 @@ A cryptocurrency tracker built with SvelteKit, Svelte, TypeScript, PostgreSQL an
 ![Overview](docs/overview.png)
 ![Coin view](docs/coin_view.png)
 
-## Install dependencies
+## Setup
 
+### Install dependencies
 ```bash
-npm run dev
+npm i
 ```
 
-## Developing
-
-Once you've installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+### Setup and configure PostgreSQL
+```bash
+npm run db:start
+```
 
 ```bash
-npm run dev
+npm run db:push
+```
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+### Run in dev mode
+```bash
+npm run dev
 ```
 
 ## Building
@@ -30,6 +34,6 @@ To create a production version of your app:
 npm run build
 ```
 
-You can preview the production build with `npm run preview`.
+## Run in production
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+After building you can run build/index.js using pm2, nginx or something simmilar.
