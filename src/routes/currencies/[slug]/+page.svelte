@@ -93,7 +93,6 @@
 
 	// Fetch data every 30 seconds
 	$effect(() => {
-		console.log(chartData);
 		if (coin?.slug) {
 			const timer = setInterval(() => {
 				fetchCoinData();
@@ -111,10 +110,10 @@
 {:else if !coin}
 	<p>Loading coin data...</p>
 {:else}
-	<div class="flex size-full flex-grow">
+	<div class="flex size-full flex-grow flex-col lg:flex-row">
 		<!-- Side information panel -->
-		<div class="w-1/3 border-r border-muted">
-			<div class="flex flex-col gap-y-1 p-4">
+		<div class="order-2 w-full border-r border-muted lg:order-1 lg:w-1/3">
+			<div class="flex flex-col gap-y-3 p-4">
 				<!-- Name, symbol and mc rank -->
 				<div class="flex items-baseline gap-x-2">
 					<h1 class="text-4xl">
@@ -153,7 +152,7 @@
 					</div>
 					{#if coin.percentChange24h}
 						<span
-							class={`text-xs ${parseFloat(coin.percentChange24h) >= 0 ? 'text-green-600' : 'text-red-600'}`}
+							class={`lg:text-xs ${parseFloat(coin.percentChange24h) >= 0 ? 'text-green-600' : 'text-red-600'}`}
 						>
 							{parseFloat(coin.percentChange24h) >= 0 ? '▲' : '▼'}
 							{Math.abs(parseFloat(coin.percentChange24h)).toFixed(2)}% (24h)
@@ -163,43 +162,53 @@
 
 				<div class="grid grid-cols-1 grid-rows-3 gap-4 md:grid-cols-2">
 					<!-- Market Cap -->
-					<div class="rounded-lg border bg-card p-2 text-center shadow-sm">
-						<div class="text-xs text-muted-foreground">Market Cap</div>
-						<div class="text-lg font-semibold">
+					<div
+						class="flex flex-col items-center justify-center rounded-lg border bg-card p-3 shadow-sm"
+					>
+						<div class="w-full text-center text-xs text-muted-foreground">Market Cap</div>
+						<div class="w-full text-center text-lg font-semibold">
 							{formatSupply(coin.marketCap)}
 						</div>
 					</div>
 
 					<!-- Volume (24h) -->
-					<div class="rounded-lg border bg-card p-2 text-center shadow-sm">
-						<div class="text-xs text-muted-foreground">Volume (24h)</div>
-						<div class="text-lg font-semibold">
+					<div
+						class="flex flex-col items-center justify-center rounded-lg border bg-card p-3 shadow-sm"
+					>
+						<div class="w-full text-center text-xs text-muted-foreground">Volume (24h)</div>
+						<div class="w-full text-center text-lg font-semibold">
 							{formatSupply(coin.volume24h)}
 						</div>
 					</div>
 
 					<!-- Total supply -->
-					<div class="rounded-lg border bg-card p-2 text-center shadow-sm">
-						<div class="text-xs text-muted-foreground">Total supply</div>
-						<div class="text-lg font-semibold">
+					<div
+						class="flex flex-col items-center justify-center rounded-lg border bg-card p-3 shadow-sm"
+					>
+						<div class="w-full text-center text-xs text-muted-foreground">Total supply</div>
+						<div class="w-full text-center text-lg font-semibold">
 							{formatSupply(coin.circulatingSupply)}
 							{coin.symbol}
 						</div>
 					</div>
 
 					<!-- Max supply -->
-					<div class="rounded-lg border bg-card p-2 text-center shadow-sm">
-						<div class="text-xs text-muted-foreground">Max. supply</div>
-						<div class="text-lg font-semibold">
+					<div
+						class="flex flex-col items-center justify-center rounded-lg border bg-card p-3 shadow-sm"
+					>
+						<div class="w-full text-center text-xs text-muted-foreground">Max. supply</div>
+						<div class="w-full text-center text-lg font-semibold">
 							{formatSupply(coin.maxSupply)}
 							{coin.symbol}
 						</div>
 					</div>
 
 					<!-- Date added -->
-					<div class="rounded-lg border bg-card p-2 text-center shadow-sm">
-						<div class="text-xs text-muted-foreground">Date added</div>
-						<div class="text-lg font-semibold">
+					<div
+						class="flex flex-col items-center justify-center rounded-lg border bg-card p-3 shadow-sm"
+					>
+						<div class="w-full text-center text-xs text-muted-foreground">Date added</div>
+						<div class="w-full text-center text-lg font-semibold">
 							{new Date(coin.dateAdded).toLocaleDateString('en-US', {
 								year: 'numeric',
 								month: 'short'
@@ -208,9 +217,11 @@
 					</div>
 
 					<!-- % change 90d -->
-					<div class="rounded-lg border bg-card p-2 text-center shadow-sm">
-						<div class="text-xs text-muted-foreground">Percent change (90d)</div>
-						<div class="text-lg font-semibold">
+					<div
+						class="flex flex-col items-center justify-center rounded-lg border bg-card p-3 shadow-sm"
+					>
+						<div class="w-full text-center text-xs text-muted-foreground">Percent change (90d)</div>
+						<div class="w-full text-center text-lg font-semibold">
 							<span
 								class={`${parseFloat(coin.percentChange90d) >= 0 ? 'text-green-600' : 'text-red-600'}`}
 							>
@@ -224,9 +235,9 @@
 		</div>
 
 		<!-- Graph panel -->
-		<div class="flex size-full flex-grow p-4">
+		<div class="order-1 flex size-full flex-grow p-4 lg:order-2">
 			<div class="w-full">
-				<div class="h-[200px] rounded border border-muted md:h-[350px] lg:h-[550px]">
+				<div class="h-[350px] transform-gpu rounded border border-muted md:h-[350px] lg:h-[550px]">
 					<Chart
 						data={chartData}
 						x="date"
@@ -241,14 +252,20 @@
 						let:padding
 						let:tooltip
 					>
-						<Svg>
+						<Svg style="transform: translateZ(0); will-change: transform;">
 							<LinearGradient class="from-primary/50 to-primary/0" vertical let:gradient>
-								<Area line={{ class: 'stroke-2 stroke-primary opacity-20' }} fill={gradient} />
+								<Area
+									line={{ class: 'stroke-2 stroke-primary opacity-20 transform-gpu' }}
+									fill={gradient}
+								/>
 								<RectClipPath x={0} y={0} width={tooltip.data ? tooltip.x : width} {height} spring>
-									<Area line={{ class: 'stroke-2 stroke-primary' }} fill={gradient} />
+									<Area line={{ class: 'stroke-2 stroke-primary transform-gpu' }} fill={gradient} />
 								</RectClipPath>
 							</LinearGradient>
-							<Highlight points lines={{ class: 'stroke-primary [stroke-dasharray:unset]' }} />
+							<Highlight
+								points
+								lines={{ class: 'stroke-primary [stroke-dasharray:unset] transform-gpu' }}
+							/>
 							<Axis placement="bottom" />
 						</Svg>
 
@@ -256,7 +273,7 @@
 							y={48}
 							xOffset={4}
 							variant="none"
-							class="text-sm font-semibold leading-3 text-primary"
+							class="transform-gpu text-sm font-semibold leading-3 text-primary will-change-transform"
 							let:data
 						>
 							{#if data.value < 0.001}
@@ -272,7 +289,7 @@
 							x={4}
 							y={4}
 							variant="none"
-							class="text-sm font-semibold leading-3"
+							class="transform-gpu text-sm font-semibold leading-3 will-change-transform"
 							let:data
 						>
 							{format(data.date, PeriodType.DayTime)}
@@ -283,7 +300,7 @@
 							y={height + padding.top + 2}
 							anchor="top"
 							variant="none"
-							class="text-primary-content whitespace-nowrap rounded bg-primary px-2 py-1 text-sm font-semibold leading-3"
+							class="text-primary-content transform-gpu whitespace-nowrap rounded bg-primary px-2 py-1 text-sm font-semibold leading-3 will-change-transform"
 							let:data
 						>
 							{format(data.date, PeriodType.DayTime)}

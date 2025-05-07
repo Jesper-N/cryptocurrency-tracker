@@ -45,7 +45,7 @@
 
 <div class="flex w-full items-center justify-between border-b border-muted py-4">
 	<div class="flex items-center px-4">
-		<div class="flex items-center pr-8">
+		<a href="/" class="flex items-center pr-8">
 			<div
 				class="mr-3 cursor-pointer"
 				aria-label="chart-line"
@@ -72,9 +72,9 @@
 				</svg>
 			</div>
 			<p class="text-xl font-medium">Cryptocurrency Tracker</p>
-		</div>
+		</a>
 
-		<nav class="flex gap-x-6">
+		<nav class="hidden gap-x-6 lg:flex">
 			<a href="/" class="text-sm font-medium transition-colors hover:text-primary">
 				Cryptocurrencies
 			</a>
@@ -86,7 +86,7 @@
 	</div>
 
 	<div class="flex justify-center">
-		<div>
+		<div class="hidden lg:block">
 			<Button variant="outline" class="justify-betwee w-64 justify-between">
 				<div class="flex items-center">
 					<Search class="-ms-1 me-2 opacity-60" size={16} strokeWidth={2} aria-hidden="true" />
