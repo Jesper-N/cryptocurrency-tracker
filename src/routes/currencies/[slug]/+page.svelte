@@ -2,30 +2,30 @@
 	import type { PriceHistoryPoint } from '$lib/types';
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import NumberFlow, { continuous } from '@number-flow/svelte';
-	import { scaleTime } from 'd3-scale';
-	import {
-		Area,
-		Axis,
-		Chart,
-		Highlight,
-		LinearGradient,
-		RectClipPath,
-		Svg,
-		Tooltip
-	} from 'layerchart';
 	import { format, PeriodType } from '@layerstack/utils';
-	const { data: initialData } = $props();
+	import * as Card from '$lib/components/ui/card/index.js';
+	import * as Chart from '$lib/components/ui/chart/index.js';
+	import { scaleUtc } from 'd3-scale';
+	import { curveMonotoneX } from 'd3-shape';
+	import { Area, AreaChart, LinearGradient } from 'layerchart';
 
-	let coin = $state(initialData?.coin);
-	let history = $state(initialData?.history || []);
-	let error = $state<string | null>(null);
+	const { data } = $props();
+
+	let coin = $derived(data?.coin);
+	let history = $derived(data?.history || []);
+	let error = $derived<string | null>(data?.error || null);
 
 	let chartData = $derived(
-		history.map((point: PriceHistoryPoint) => ({
-			date: new Date(point.timestamp),
-			value: parseFloat(point.price)
-		}))
+		history
+			.map((point: PriceHistoryPoint) => ({
+				date: new Date(point.timestamp),
+				value: parseFloat(point.price)
+			}))
+			.sort((a, b) => a.date.getTime() - b.date.getTime())
 	);
+
+	let yMin = $derived(chartData.length ? Math.min(...chartData.map((d) => d.value)) * 0.998 : 0);
+	let yMax = $derived(chartData.length ? Math.max(...chartData.map((d) => d.value)) * 1.001 : 100);
 
 	// Helper function to safely parse a float value
 	function safeParseFloat(value: string | number | null | undefined): number {
@@ -93,6 +93,7 @@
 
 	// Fetch data every 30 seconds
 	$effect(() => {
+		console.log(chartData);
 		if (coin?.slug) {
 			const timer = setInterval(() => {
 				fetchCoinData();
@@ -110,16 +111,16 @@
 {:else if !coin}
 	<p>Loading coin data...</p>
 {:else}
-	<div class="flex size-full flex-grow flex-col lg:flex-row">
+	<div class="flex size-full grow">
 		<!-- Side information panel -->
-		<div class="order-2 w-full border-r border-muted lg:order-1 lg:w-1/3">
-			<div class="flex flex-col gap-y-3 p-4">
+		<div class="border-muted w-1/3 border-r">
+			<div class="flex flex-col gap-y-6 p-4">
 				<!-- Name, symbol and mc rank -->
 				<div class="flex items-baseline gap-x-2">
 					<h1 class="text-4xl">
 						{coin.name}
 					</h1>
-					<h2 class="text-lg text-muted-foreground">{coin.symbol}</h2>
+					<h2 class="text-muted-foreground text-lg">{coin.symbol}</h2>
 					<Badge>#{coin.cmcRank}</Badge>
 				</div>
 
@@ -152,7 +153,7 @@
 					</div>
 					{#if coin.percentChange24h}
 						<span
-							class={`lg:text-xs ${parseFloat(coin.percentChange24h) >= 0 ? 'text-green-600' : 'text-red-600'}`}
+							class={`text-xs ${parseFloat(coin.percentChange24h) >= 0 ? 'text-green-600' : 'text-red-600'}`}
 						>
 							{parseFloat(coin.percentChange24h) >= 0 ? '▲' : '▼'}
 							{Math.abs(parseFloat(coin.percentChange24h)).toFixed(2)}% (24h)
@@ -162,53 +163,43 @@
 
 				<div class="grid grid-cols-1 grid-rows-3 gap-4 md:grid-cols-2">
 					<!-- Market Cap -->
-					<div
-						class="flex flex-col items-center justify-center rounded-lg border bg-card p-3 shadow-sm"
-					>
-						<div class="w-full text-center text-xs text-muted-foreground">Market Cap</div>
-						<div class="w-full text-center text-lg font-semibold">
+					<div class="bg-card border-border rounded-lg border p-2 text-center shadow-sm">
+						<div class="text-muted-foreground text-xs">Market Cap</div>
+						<div class="text-lg font-semibold">
 							{formatSupply(coin.marketCap)}
 						</div>
 					</div>
 
 					<!-- Volume (24h) -->
-					<div
-						class="flex flex-col items-center justify-center rounded-lg border bg-card p-3 shadow-sm"
-					>
-						<div class="w-full text-center text-xs text-muted-foreground">Volume (24h)</div>
-						<div class="w-full text-center text-lg font-semibold">
+					<div class="bg-card border-border rounded-lg border p-2 text-center shadow-sm">
+						<div class="text-muted-foreground text-xs">Volume (24h)</div>
+						<div class="text-lg font-semibold">
 							{formatSupply(coin.volume24h)}
 						</div>
 					</div>
 
 					<!-- Total supply -->
-					<div
-						class="flex flex-col items-center justify-center rounded-lg border bg-card p-3 shadow-sm"
-					>
-						<div class="w-full text-center text-xs text-muted-foreground">Total supply</div>
-						<div class="w-full text-center text-lg font-semibold">
+					<div class="bg-card border-border rounded-lg border p-2 text-center shadow-sm">
+						<div class="text-muted-foreground text-xs">Total supply</div>
+						<div class="text-lg font-semibold">
 							{formatSupply(coin.circulatingSupply)}
 							{coin.symbol}
 						</div>
 					</div>
 
 					<!-- Max supply -->
-					<div
-						class="flex flex-col items-center justify-center rounded-lg border bg-card p-3 shadow-sm"
-					>
-						<div class="w-full text-center text-xs text-muted-foreground">Max. supply</div>
-						<div class="w-full text-center text-lg font-semibold">
+					<div class="bg-card border-border rounded-lg border p-2 text-center shadow-sm">
+						<div class="text-muted-foreground text-xs">Max. supply</div>
+						<div class="text-lg font-semibold">
 							{formatSupply(coin.maxSupply)}
 							{coin.symbol}
 						</div>
 					</div>
 
 					<!-- Date added -->
-					<div
-						class="flex flex-col items-center justify-center rounded-lg border bg-card p-3 shadow-sm"
-					>
-						<div class="w-full text-center text-xs text-muted-foreground">Date added</div>
-						<div class="w-full text-center text-lg font-semibold">
+					<div class="bg-card border-border rounded-lg border p-2 text-center shadow-sm">
+						<div class="text-muted-foreground text-xs">Date added</div>
+						<div class="text-lg font-semibold">
 							{new Date(coin.dateAdded).toLocaleDateString('en-US', {
 								year: 'numeric',
 								month: 'short'
@@ -217,11 +208,9 @@
 					</div>
 
 					<!-- % change 90d -->
-					<div
-						class="flex flex-col items-center justify-center rounded-lg border bg-card p-3 shadow-sm"
-					>
-						<div class="w-full text-center text-xs text-muted-foreground">Percent change (90d)</div>
-						<div class="w-full text-center text-lg font-semibold">
+					<div class="bg-card border-border rounded-lg border p-2 text-center shadow-sm">
+						<div class="text-muted-foreground text-xs">Percent change (90d)</div>
+						<div class="text-lg font-semibold">
 							<span
 								class={`${parseFloat(coin.percentChange90d) >= 0 ? 'text-green-600' : 'text-red-600'}`}
 							>
@@ -235,79 +224,82 @@
 		</div>
 
 		<!-- Graph panel -->
-		<div class="order-1 flex size-full flex-grow p-4 lg:order-2">
-			<div class="w-full">
-				<div class="h-[350px] transform-gpu rounded border border-muted md:h-[350px] lg:h-[550px]">
-					<Chart
-						data={chartData}
-						x="date"
-						xScale={scaleTime()}
-						y="value"
-						yDomain={[null, null]}
-						yNice
-						padding={{ top: 48, bottom: 24 }}
-						tooltip={{ mode: 'bisect-x' }}
-						let:width
-						let:height
-						let:padding
-						let:tooltip
-					>
-						<Svg style="transform: translateZ(0); will-change: transform;">
-							<LinearGradient class="from-primary/50 to-primary/0" vertical let:gradient>
-								<Area
-									line={{ class: 'stroke-2 stroke-primary opacity-20 transform-gpu' }}
-									fill={gradient}
-								/>
-								<RectClipPath x={0} y={0} width={tooltip.data ? tooltip.x : width} {height} spring>
-									<Area line={{ class: 'stroke-2 stroke-primary transform-gpu' }} fill={gradient} />
-								</RectClipPath>
-							</LinearGradient>
-							<Highlight
-								points
-								lines={{ class: 'stroke-primary [stroke-dasharray:unset] transform-gpu' }}
-							/>
-							<Axis placement="bottom" />
-						</Svg>
-
-						<Tooltip.Root
-							y={48}
-							xOffset={4}
-							variant="none"
-							class="transform-gpu text-sm font-semibold leading-3 text-primary will-change-transform"
-							let:data
+		<div class="flex size-full grow p-2">
+			<Card.Root class="w-full">
+				<Card.Header>
+					<Card.Title>{coin?.name} Price</Card.Title>
+					<Card.Description>Last 30D price history</Card.Description>
+				</Card.Header>
+				<Card.Content>
+					<div class="h-[200px] w-full md:h-[350px] lg:h-[500px]">
+						<Chart.Container
+							config={{
+								value: { label: 'Price', color: 'var(--chart-1)' }
+							}}
+							class="h-full w-full"
 						>
-							{#if data.value < 0.001}
-								${data.value.toFixed(8)}
-							{:else if data.value < 1}
-								${data.value.toFixed(4)}
-							{:else}
-								{format(data.value, 'currency')}
-							{/if}
-						</Tooltip.Root>
-
-						<Tooltip.Root
-							x={4}
-							y={4}
-							variant="none"
-							class="transform-gpu text-sm font-semibold leading-3 will-change-transform"
-							let:data
-						>
-							{format(data.date, PeriodType.DayTime)}
-						</Tooltip.Root>
-
-						<Tooltip.Root
-							x="data"
-							y={height + padding.top + 2}
-							anchor="top"
-							variant="none"
-							class="text-primary-content transform-gpu whitespace-nowrap rounded bg-primary px-2 py-1 text-sm font-semibold leading-3 will-change-transform"
-							let:data
-						>
-							{format(data.date, PeriodType.DayTime)}
-						</Tooltip.Root>
-					</Chart>
-				</div>
-			</div>
+							<AreaChart
+								data={chartData}
+								x="date"
+								xScale={scaleUtc()}
+								yDomain={[yMin, yMax]}
+								yNice
+								padding={{ top: 10, bottom: 30, left: 0, right: 0 }}
+								series={[
+									{
+										key: 'value',
+										label: 'Price',
+										color: 'var(--color-primary)'
+									}
+								]}
+								props={{
+									area: {
+										curve: curveMonotoneX,
+										'fill-opacity': 0.4,
+										motion: 'tween'
+									},
+									xAxis: {
+										format: (v: Date) =>
+											v.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+									},
+									yAxis: {
+										format: () => ''
+									}
+								}}
+							>
+								{#snippet tooltip()}
+									<Chart.Tooltip
+										indicator="line"
+										labelFormatter={(v: Date) =>
+											v.toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric',
+												hour: '2-digit',
+												minute: '2-digit'
+											})}
+									/>
+								{/snippet}
+								{#snippet marks({ series, getAreaProps })}
+									{#each series as s, i (s.key)}
+										<LinearGradient
+											stops={[
+												'var(--color-primary)',
+												'color-mix(in lch, var(--color-primary) 10%, transparent)'
+											]}
+											vertical
+										>
+											{#snippet children({ gradient })}
+												<Area {...getAreaProps(s, i)} fill={gradient} />
+											{/snippet}
+										</LinearGradient>
+									{/each}
+								{/snippet}
+							</AreaChart>
+						</Chart.Container>
+					</div>
+				</Card.Content>
+			</Card.Root>
 		</div>
 	</div>
 {/if}

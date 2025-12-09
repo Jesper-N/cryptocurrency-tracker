@@ -39,18 +39,12 @@ async function fetchCryptoData(): Promise<CMCApiResponse> {
 async function updateDatabase(cryptoData: CMCApiResponse): Promise<void> {
 	const { data: cryptoCoins } = cryptoData;
 
-	// Handle each coin in the response
 	for (const coin of cryptoCoins) {
 		const usdData = coin.quote.USD;
-
-		// Convert string ID to match our schema
 		const coinId = coin.id.toString();
 
 		try {
-			// Check if the coin already exists
 			const existingCoin = await db.select().from(coins).where(eq(coins.id, coinId)).limit(1);
-
-			// Prepare the coin data - convert numbers to strings for numeric fields
 			const coinData = {
 				id: coinId,
 				name: coin.name,
@@ -75,14 +69,11 @@ async function updateDatabase(cryptoData: CMCApiResponse): Promise<void> {
 
 			// Update or insert the coin data
 			if (existingCoin.length > 0) {
-				// Update existing coin
 				await db.update(coins).set(coinData).where(eq(coins.id, coinId));
 			} else {
-				// Insert new coin
 				await db.insert(coins).values(coinData);
 			}
 
-			// Insert price history data - make sure to use the correct field name and convert price to string
 			await db.insert(priceHistory).values({
 				coinId: coinId,
 				price: String(usdData.price),
@@ -90,8 +81,6 @@ async function updateDatabase(cryptoData: CMCApiResponse): Promise<void> {
 			});
 		} catch (error) {
 			console.error(`Error processing coin ${coin.name}:`, error);
-			// Continue with the next coin instead of failing the entire update
-			continue;
 		}
 	}
 
@@ -111,14 +100,11 @@ async function runUpdateCycle(): Promise<void> {
 // Initialize the polling service
 export function initCMCPollingService(): { stop: () => void } {
 	console.log('Starting CMC polling service...');
-
-	// Run immediately on startup
 	runUpdateCycle();
 
 	// Set up interval for subsequent updates
 	const intervalId = setInterval(runUpdateCycle, FETCH_INTERVAL);
 
-	// Return a function to stop the polling if needed
 	return {
 		stop: () => {
 			clearInterval(intervalId);
