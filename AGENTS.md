@@ -51,10 +51,10 @@ Reduce total variable count by inlining when a value is only used once.
 
 ```ts
 // Good
-const journal = await read(path.join(dir, 'journal.json'));
+const journal = await read(path.join(dir, "journal.json"));
 
 // Bad
-const journalPath = path.join(dir, 'journal.json');
+const journalPath = path.join(dir, "journal.json");
 const journal = await read(journalPath);
 ```
 
@@ -82,7 +82,7 @@ CONTEXT: THIS IS A GREENFIELD PROJECT. ZERO EXISTING USERS. OPTIMIZE ENTIRELY FO
 
 ```ts
 // ❌ BAD: Silent fallback to empty/default (masks data pipeline bugs)
-const apiKey = process.env.API_KEY ?? '';
+const apiKey = process.env.API_KEY ?? "";
 const batchPath = extractPath(msg) ?? getTodayPath();
 const cost = data.cost ?? 0;
 const avatar = user.avatar ?? defaultAvatar; // Let the UI break so we fix the data
@@ -93,13 +93,13 @@ poll().catch(() => {});
 
 // ❌ BAD: Swallowing errors and continuing
 try {
-	const data = await fetchData();
+  const data = await fetchData();
 } catch {
-	return null; // Caller has no idea this failed
+  return null; // Caller has no idea this failed
 }
 
 // ❌ BAD: Dev defaults that could leak to prod
-const secret = process.env.SECRET || 'dev-secret-change-me';
+const secret = process.env.SECRET || "dev-secret-change-me";
 ```
 
 ### What To Do Instead (Fail Fast & Loud)
@@ -107,18 +107,18 @@ const secret = process.env.SECRET || 'dev-secret-change-me';
 ```ts
 // ✅ GOOD: Fail immediately if required value missing
 const apiKey = process.env.API_KEY;
-if (!apiKey) throw new Error('API_KEY environment variable is required');
+if (!apiKey) throw new Error("API_KEY environment variable is required");
 // ✅ GOOD: Validate and reject, don't fallback
 
 const batchPath = extractPath(msg);
-if (!batchPath) throw new Error('Message missing required metadata: batchPath');
+if (!batchPath) throw new Error("Message missing required metadata: batchPath");
 // ✅ GOOD: Explicit error bubbling (No silent catches)
 
 try {
-	await sendAlert(error);
+  await sendAlert(error);
 } catch (alertError) {
-	console.error('FATAL: Failed to send alert:', alertError);
-	throw alertError; // Always re-throw unless at the absolute top boundary
+  console.error("FATAL: Failed to send alert:", alertError);
+  throw alertError; // Always re-throw unless at the absolute top boundary
 }
 // ✅ GOOD: Using the Audit Tag ONLY when strictly required by a framework
 

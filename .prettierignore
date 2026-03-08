@@ -3,3 +3,7 @@ package-lock.json
 pnpm-lock.yaml
 yarn.lock
 src/lib/components/ui/**
+.svelte-kit
+build
+dist
+coverage

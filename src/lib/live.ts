@@ -1,39 +1,39 @@
-import { invalidate } from '$app/navigation';
+import { invalidate } from "$app/navigation";
 
 export function live(key: string, span: number) {
-	let id: ReturnType<typeof setInterval> | null = null;
+  let id: ReturnType<typeof setInterval> | null = null;
 
-	const sync = () => {
-		if (document.hidden) {
-			if (!id) {
-				return;
-			}
+  const sync = () => {
+    if (document.hidden) {
+      if (!id) {
+        return;
+      }
 
-			clearInterval(id);
-			id = null;
+      clearInterval(id);
+      id = null;
 
-			return;
-		}
+      return;
+    }
 
-		if (id) {
-			return;
-		}
+    if (id) {
+      return;
+    }
 
-		id = setInterval(() => {
-			void invalidate(key);
-		}, span);
-	};
+    id = setInterval(() => {
+      void invalidate(key);
+    }, span);
+  };
 
-	sync();
-	document.addEventListener('visibilitychange', sync);
+  sync();
+  document.addEventListener("visibilitychange", sync);
 
-	return () => {
-		document.removeEventListener('visibilitychange', sync);
+  return () => {
+    document.removeEventListener("visibilitychange", sync);
 
-		if (!id) {
-			return;
-		}
+    if (!id) {
+      return;
+    }
 
-		clearInterval(id);
-	};
+    clearInterval(id);
+  };
 }

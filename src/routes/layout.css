@@ -1,10 +1,10 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 @reference '../app.css';
 
 @utility shell {
-	@apply bg-background relative flex min-h-screen w-full justify-center;
+  @apply bg-background relative flex min-h-screen w-full justify-center;
 }
 
 @utility frame {
-	@apply border-border flex min-h-screen w-full max-w-[1600px] flex-col border-x bg-transparent;
+  @apply border-border flex min-h-screen w-full max-w-[1600px] flex-col border-x bg-transparent;
 }
