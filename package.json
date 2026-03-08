@@ -54,6 +54,7 @@
 	},
 	"dependencies": {
 		"@fontsource-variable/montserrat": "^5.2.8",
+		"@fontsource/geist-mono": "^5.2.7",
 		"@tailwindcss/postcss": "^4.1.17",
 		"axios": "^1.9.0",
 		"d3-array": "^3.2.4",
@@ -62,6 +63,7 @@
 		"drizzle-orm": "^0.38.4",
 		"ky": "^1.8.1",
 		"mode-watcher": "^0.5.1",
+		"motion": "^12.35.1",
 		"node-cron": "^3.0.3",
 		"postgres": "^3.4.5",
 		"torph": "^0.0.9"

@@ -1,9 +1,5 @@
 <script lang="ts">
-	import type {
-		CoinDetailResponse,
-		CoinRecord,
-		PriceHistoryPoint
-	} from '../../../lib/coin-types.js';
+	import type { CoinDetailResponse, PriceHistoryPoint } from '../../../lib/coin-types.js';
 	import type { PageData } from './$types';
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import { TextMorph } from 'torph/svelte';
@@ -12,22 +8,18 @@
 	import { scaleUtc } from 'd3-scale';
 	import { curveMonotoneX } from 'd3-shape';
 	import { Area, AreaChart, LinearGradient } from 'layerchart';
+	import { animate } from 'motion';
 
 	type ChartPoint = {
 		date: Date;
 		value: number;
 	};
 
-	const { data }: { data: PageData } = $props();
+	let { data }: { data: PageData } = $props();
 
-	let coin = $state<CoinRecord | null>(null);
-	let history = $state<PriceHistoryPoint[]>([]);
+	let coin = $derived(data.coin);
+	let history = $derived(data.history);
 	let error = $state<string | null>(null);
-
-	$effect(() => {
-		coin = data.coin;
-		history = data.history;
-	});
 
 	let chartData = $derived(
 		history
@@ -120,6 +112,22 @@
 			return () => clearInterval(timer);
 		}
 	});
+
+	function animatePanel(node: HTMLElement) {
+		animate(
+			node,
+			{ opacity: [0, 1] as any, transform: ['translateX(-20px)', 'translateX(0px)'] as any },
+			{ duration: 0.5, type: 'spring', stiffness: 300, damping: 25 } as any
+		);
+	}
+
+	function animateChart(node: HTMLElement) {
+		animate(
+			node,
+			{ opacity: [0, 1] as any, transform: ['translateY(20px)', 'translateY(0px)'] as any },
+			{ duration: 0.5, delay: 0.2, type: 'spring', stiffness: 300, damping: 25 } as any
+		);
+	}
 </script>
 
 {#if error}
@@ -137,7 +145,7 @@
 	{@const percentChange90d = safeParseFloat(coin.percentChange90d)}
 	<div class="flex size-full grow">
 		<!-- Side information panel -->
-		<div class="border-muted w-1/3 border-r">
+		<div use:animatePanel class="border-muted w-1/3 border-r">
 			<div class="flex flex-col gap-y-6 p-4">
 				<!-- Name, symbol and mc rank -->
 				<div class="flex items-baseline gap-x-2">
@@ -166,45 +174,45 @@
 					{/if}
 				</div>
 
-				<div class="grid grid-cols-1 grid-rows-3 gap-4 md:grid-cols-2">
+				<div class="border-border grid grid-cols-1 grid-rows-3 gap-0 border">
 					<!-- Market Cap -->
-					<div class="bg-card border-border rounded-lg border p-2 text-center shadow-sm">
-						<div class="text-muted-foreground text-xs">Market Cap</div>
-						<div class="text-lg font-semibold">
+					<div class="bg-card border-border border-r border-b p-3">
+						<div class="text-muted-foreground text-xs tracking-wider uppercase">Market Cap</div>
+						<div class="text-lg">
 							{formatSupply(coin.marketCap)}
 						</div>
 					</div>
 
 					<!-- Volume (24h) -->
-					<div class="bg-card border-border rounded-lg border p-2 text-center shadow-sm">
-						<div class="text-muted-foreground text-xs">Volume (24h)</div>
-						<div class="text-lg font-semibold">
+					<div class="bg-card border-border border-b p-3">
+						<div class="text-muted-foreground text-xs tracking-wider uppercase">Volume (24h)</div>
+						<div class="text-lg">
 							{formatSupply(coin.volume24h)}
 						</div>
 					</div>
 
 					<!-- Total supply -->
-					<div class="bg-card border-border rounded-lg border p-2 text-center shadow-sm">
-						<div class="text-muted-foreground text-xs">Total supply</div>
-						<div class="text-lg font-semibold">
+					<div class="bg-card border-border border-r border-b p-3">
+						<div class="text-muted-foreground text-xs tracking-wider uppercase">Total supply</div>
+						<div class="text-lg">
 							{formatSupply(coin.circulatingSupply)}
 							{coin.symbol}
 						</div>
 					</div>
 
 					<!-- Max supply -->
-					<div class="bg-card border-border rounded-lg border p-2 text-center shadow-sm">
-						<div class="text-muted-foreground text-xs">Max. supply</div>
-						<div class="text-lg font-semibold">
+					<div class="bg-card border-border border-b p-3">
+						<div class="text-muted-foreground text-xs tracking-wider uppercase">Max. supply</div>
+						<div class="text-lg">
 							{formatSupply(coin.maxSupply)}
 							{coin.symbol}
 						</div>
 					</div>
 
 					<!-- Date added -->
-					<div class="bg-card border-border rounded-lg border p-2 text-center shadow-sm">
-						<div class="text-muted-foreground text-xs">Date added</div>
-						<div class="text-lg font-semibold">
+					<div class="bg-card border-border border-r p-3">
+						<div class="text-muted-foreground text-xs tracking-wider uppercase">Date added</div>
+						<div class="text-lg">
 							{new Date(coin.dateAdded).toLocaleDateString('en-US', {
 								year: 'numeric',
 								month: 'short'
@@ -213,9 +221,11 @@
 					</div>
 
 					<!-- % change 90d -->
-					<div class="bg-card border-border rounded-lg border p-2 text-center shadow-sm">
-						<div class="text-muted-foreground text-xs">Percent change (90d)</div>
-						<div class="text-lg font-semibold">
+					<div class="bg-card p-3">
+						<div class="text-muted-foreground text-xs tracking-wider uppercase">
+							Percent change (90d)
+						</div>
+						<div class="text-lg">
 							<span class={percentChange90d >= 0 ? 'text-green-600' : 'text-red-600'}>
 								{percentChange90d >= 0 ? '▲' : '▼'}
 								{Math.abs(percentChange90d).toFixed(2)}%
@@ -227,7 +237,7 @@
 		</div>
 
 		<!-- Graph panel -->
-		<div class="flex size-full grow p-2">
+		<div use:animateChart class="flex size-full grow p-2">
 			<Card.Root class="w-full">
 				<Card.Header>
 					<Card.Title>{coin.name} Price</Card.Title>

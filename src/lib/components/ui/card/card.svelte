@@ -13,8 +13,9 @@
 
 <div
 	bind:this={ref}
-	class={cn('bg-card text-card-foreground border-border rounded-lg border shadow-sm', className)}
+	class={cn('bg-card text-card-foreground crosshair-container crosshair-corners', className)}
 	{...restProps}
 >
+	<div class="corner-bottom"></div>
 	{@render children?.()}
 </div>

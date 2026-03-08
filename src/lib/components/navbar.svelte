@@ -5,63 +5,14 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import { buttonVariants } from '$lib/components/ui/button/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
-
-	// Logo animation properties
-	let logoColor = 'currentColor';
-	let logoSize = 26;
-	let logoStrokeWidth = 2;
-	let shouldAnimate = $state(false);
-
-	// Animation function for logo
-	function animateLogo() {
-		shouldAnimate = true;
-		setTimeout(() => {
-			shouldAnimate = false;
-		}, 700);
-	}
-
-	// For hover effect
-	function handleMouseEnter() {
-		animateLogo();
-	}
-
-	$effect(() => {
-		const timer = setTimeout(() => {
-			animateLogo();
-		}, 1);
-
-		// Cleanup function
-		return () => clearTimeout(timer);
-	});
 </script>
 
-<div class="border-muted flex w-full items-center justify-between border-b py-4">
+<div
+	class="border-muted bg-background/80 sticky top-0 z-50 flex w-full items-center justify-between border-b py-4 backdrop-blur-md"
+>
 	<div class="flex items-center px-4">
 		<a href={resolve('/')} class="flex items-center pr-8">
-			<div
-				class="mr-3 cursor-pointer"
-				aria-label="chart-line"
-				role="img"
-				onmouseenter={handleMouseEnter}
-			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width={logoSize}
-					height={logoSize}
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke={logoColor}
-					stroke-width={logoStrokeWidth}
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					class="chart-line-icon transition-transform hover:scale-105"
-					class:animate={shouldAnimate}
-				>
-					<path d="M3 3v16a2 2 0 0 0 2 2h16" class="frame" />
-					<path d="m7 13 3-3 4 4 5-5" class="line" />
-				</svg>
-			</div>
-			<p class="text-xl font-medium">Cryptocurrency Tracker</p>
+			<p class="text-xl font-medium">CR Tracker</p>
 		</a>
 
 		<nav class="flex gap-x-6">
@@ -85,13 +36,13 @@
 
 	<div class="flex justify-center">
 		<div>
-			<Button variant="outline" class="justify-betwee w-64 justify-between">
+			<Button variant="outline" class="border-border w-64 justify-between rounded-none">
 				<div class="flex items-center">
 					<Search class="-ms-1 me-2 opacity-60" size={16} strokeWidth={2} aria-hidden="true" />
 					Search
 				</div>
 				<kbd
-					class="border-border text-muted-foreground/70 ms-3 -me-1 inline-flex size-5 max-h-full items-center justify-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium"
+					class="border-border text-muted-foreground/70 ms-3 -me-1 inline-flex size-5 max-h-full items-center justify-center border px-1 font-[inherit] text-[0.625rem] font-medium"
 				>
 					/
 				</kbd>
@@ -99,7 +50,13 @@
 		</div>
 		<div class="px-4">
 			<DropdownMenu.Root>
-				<DropdownMenu.Trigger class={buttonVariants({ variant: 'outline', size: 'icon' })}>
+				<DropdownMenu.Trigger
+					class={buttonVariants({
+						variant: 'outline',
+						size: 'icon',
+						class: 'border-border rounded-none'
+					})}
+				>
 					<Sun
 						class="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90"
 					/>
@@ -117,37 +74,3 @@
 		</div>
 	</div>
 </div>
-
-<style>
-	/* These animations can't be easily done with Tailwind alone */
-	.chart-line-icon {
-		overflow: visible;
-	}
-
-	.line {
-		stroke-dasharray: 17;
-		stroke-dashoffset: 0;
-		transition:
-			stroke-dashoffset 0.3s ease,
-			opacity 0.3s ease;
-	}
-
-	.chart-line-icon.animate .line {
-		animation: lineAnimation 0.6s ease backwards;
-	}
-
-	@keyframes lineAnimation {
-		0% {
-			stroke-dashoffset: 17;
-			opacity: 1;
-		}
-		15% {
-			stroke-dashoffset: 17;
-			opacity: 0;
-		}
-		100% {
-			stroke-dashoffset: 0;
-			opacity: 1;
-		}
-	}
-</style>
