@@ -1,4 +1,13 @@
-import { pgTable, serial, text, timestamp, numeric, integer, index } from 'drizzle-orm/pg-core';
+import {
+	index,
+	integer,
+	numeric,
+	pgTable,
+	serial,
+	text,
+	timestamp,
+	uniqueIndex
+} from 'drizzle-orm/pg-core';
 
 // Current data about coins
 export const coins = pgTable(
@@ -29,7 +38,7 @@ export const coins = pgTable(
 
 		lastUpdated: timestamp('last_updated').notNull().defaultNow()
 	},
-	(table) => [index('coins_slug_idx').on(table.slug)]
+	(table) => [uniqueIndex('coins_slug_idx').on(table.slug)]
 );
 
 // Historical price data about each coin

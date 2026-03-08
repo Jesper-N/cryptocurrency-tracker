@@ -2,16 +2,19 @@
 	import { resolve } from '$app/paths';
 	import { Sun, Moon, Search } from '@lucide/svelte';
 	import { resetMode, setMode } from 'mode-watcher';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import { buttonVariants } from '$lib/components/ui/button/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import { buttonVariants } from '$lib/components/ui/button/index.js';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
+
+	const home = resolve('/');
+	const nav = ['Cryptocurrencies', 'DexScan', 'Exchanges', 'Community', 'Products'];
 </script>
 
 <div
 	class="border-border bg-background/95 supports-[backdrop-filter]:bg-background/80 sticky top-0 z-50 flex w-full items-center justify-between border-b px-4 py-3 backdrop-blur-md"
 >
 	<div class="flex items-center">
-		<a href={resolve('/')} class="flex items-center pr-8">
+		<a href={home} class="flex items-center pr-8">
 			<span
 				class="bg-foreground text-background mr-2 px-1.5 py-0.5 text-xs font-bold tracking-widest uppercase"
 				>CR</span
@@ -20,36 +23,14 @@
 		</a>
 
 		<nav class="hidden gap-x-6 md:flex">
-			<a
-				href={resolve('/')}
-				class="text-muted-foreground hover:text-foreground text-xs font-medium tracking-[0.15em] uppercase transition-colors"
-			>
-				Cryptocurrencies
-			</a>
-			<a
-				href={resolve('/')}
-				class="text-muted-foreground hover:text-foreground text-xs font-medium tracking-[0.15em] uppercase transition-colors"
-			>
-				DexScan
-			</a>
-			<a
-				href={resolve('/')}
-				class="text-muted-foreground hover:text-foreground text-xs font-medium tracking-[0.15em] uppercase transition-colors"
-			>
-				Exchanges
-			</a>
-			<a
-				href={resolve('/')}
-				class="text-muted-foreground hover:text-foreground text-xs font-medium tracking-[0.15em] uppercase transition-colors"
-			>
-				Community
-			</a>
-			<a
-				href={resolve('/')}
-				class="text-muted-foreground hover:text-foreground text-xs font-medium tracking-[0.15em] uppercase transition-colors"
-			>
-				Products
-			</a>
+			{#each nav as item (item)}
+				<a
+					href={home}
+					class="text-muted-foreground hover:text-foreground text-xs font-medium tracking-[0.15em] uppercase transition-colors"
+				>
+					{item}
+				</a>
+			{/each}
 		</nav>
 	</div>
 

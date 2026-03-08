@@ -1,7 +1,15 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import { DATABASE_URL } from '$env/static/private';
+import { privateEnv } from '$lib/server/env';
 
-if (!DATABASE_URL) throw new Error('DATABASE_URL is not set');
-const client = postgres(DATABASE_URL);
-export const db = drizzle(client);
+let root: ReturnType<typeof drizzle> | null = null;
+
+export function db() {
+	if (root) {
+		return root;
+	}
+
+	root = drizzle(postgres(privateEnv.DATABASE_URL));
+
+	return root;
+}

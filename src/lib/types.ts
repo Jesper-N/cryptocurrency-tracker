@@ -1,13 +1,3 @@
-import type { RequestEvent } from '@sveltejs/kit';
-
-export type RequestHandler = {
-	GET?: (event: RequestEvent) => Promise<Response> | Response;
-	POST?: (event: RequestEvent) => Promise<Response> | Response;
-	PUT?: (event: RequestEvent) => Promise<Response> | Response;
-	DELETE?: (event: RequestEvent) => Promise<Response> | Response;
-	PATCH?: (event: RequestEvent) => Promise<Response> | Response;
-};
-
 // CoinMarketCap API types
 export interface CMCApiResponse {
 	status: {
@@ -45,9 +35,4 @@ export interface CryptoCoin {
 			last_updated: string;
 		};
 	};
-}
-
-export interface PriceHistoryPoint {
-	price: string;
-	timestamp: string;
 }

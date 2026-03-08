@@ -1,6 +1,6 @@
 export interface PriceHistoryPoint {
 	price: string;
-	timestamp: string;
+	timestamp: Date | string;
 }
 
 export interface CoinRecord {
@@ -8,7 +8,7 @@ export interface CoinRecord {
 	name: string;
 	symbol: string;
 	slug: string;
-	dateAdded: string;
+	dateAdded: Date | string;
 	maxSupply: string | null;
 	circulatingSupply: string | null;
 	cmcRank: number;
@@ -22,7 +22,7 @@ export interface CoinRecord {
 	percentChange30d: string | null;
 	percentChange60d: string | null;
 	percentChange90d: string | null;
-	lastUpdated: string;
+	lastUpdated: Date | string;
 }
 
 export interface CoinWithHistory extends CoinRecord {
@@ -31,11 +31,9 @@ export interface CoinWithHistory extends CoinRecord {
 
 export interface CoinsResponse {
 	coins: CoinWithHistory[];
-	error?: string;
 }
 
 export interface CoinDetailResponse {
 	coin: CoinRecord;
 	history: PriceHistoryPoint[];
-	message?: string;
 }
