@@ -3,7 +3,6 @@
 	import type { PageData } from './$types';
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import { TextMorph } from 'torph/svelte';
-	import * as Card from '$lib/components/ui/card/index.js';
 	import * as Chart from '$lib/components/ui/chart/index.js';
 	import { scaleUtc } from 'd3-scale';
 	import { curveMonotoneX } from 'd3-shape';
@@ -116,25 +115,40 @@
 	function animatePanel(node: HTMLElement) {
 		animate(
 			node,
-			{ opacity: [0, 1] as any, transform: ['translateX(-20px)', 'translateX(0px)'] as any },
-			{ duration: 0.5, type: 'spring', stiffness: 300, damping: 25 } as any
+			{ opacity: [0, 1] as any, transform: ['translateY(5px)', 'translateY(0px)'] as any },
+			{ duration: 0.3, easing: 'ease-out' } as any
 		);
 	}
 
 	function animateChart(node: HTMLElement) {
 		animate(
 			node,
-			{ opacity: [0, 1] as any, transform: ['translateY(20px)', 'translateY(0px)'] as any },
-			{ duration: 0.5, delay: 0.2, type: 'spring', stiffness: 300, damping: 25 } as any
+			{ opacity: [0, 1] as any, transform: ['translateY(5px)', 'translateY(0px)'] as any },
+			{ duration: 0.3, delay: 0.1, easing: 'ease-out' } as any
 		);
 	}
 </script>
 
 {#if error}
-	<p class="error">Error loading data: {error}</p>
-	<button onclick={fetchCoinData}>Try Again</button>
+	<div class="flex h-full w-full items-center justify-center p-8">
+		<div
+			class="crosshair-corners crosshair-container flex flex-col items-center gap-y-4 p-8 text-center"
+		>
+			<p class="lbl-technical text-chart-3">Error loading data</p>
+			<p class="val-technical text-chart-3">{error}</p>
+			<button
+				class="lbl-technical border-border hover:bg-muted/10 mt-4 border px-4 py-2 transition-colors"
+				onclick={fetchCoinData}>Try Again</button
+			>
+		</div>
+	</div>
 {:else if !coin}
-	<p>Loading coin data...</p>
+	<div class="flex h-full w-full items-center justify-center p-12">
+		<div class="flex items-center gap-3">
+			<span class="val-technical animate-pulse font-bold">_</span>
+			<span class="lbl-technical text-muted-foreground">RECEIVING MARKET DATA...</span>
+		</div>
+	</div>
 {:else}
 	{@const priceNum = safeParseFloat(coin.currentPrice)}
 	{@const isVerySmallPrice = priceNum > 0 && priceNum < 0.0001}
@@ -143,92 +157,98 @@
 		? `$${priceNum.toFixed(pricePrecision)}`
 		: formatPrice(priceNum, pricePrecision)}
 	{@const percentChange90d = safeParseFloat(coin.percentChange90d)}
-	<div class="flex size-full grow">
-		<!-- Side information panel -->
-		<div use:animatePanel class="border-muted w-1/3 border-r">
-			<div class="flex flex-col gap-y-6 p-4">
-				<!-- Name, symbol and mc rank -->
-				<div class="flex items-baseline gap-x-2">
-					<h1 class="text-4xl">
-						{coin.name}
-					</h1>
-					<h2 class="text-muted-foreground text-lg">{coin.symbol}</h2>
-					<Badge>#{coin.cmcRank}</Badge>
-				</div>
 
-				<div class="flex flex-wrap items-center gap-2">
-					<div class="text-3xl font-bold">
-						{#if priceNum === 0}
-							<TextMorph text={animatedPrice} />
-						{:else}
-							{formatPrice(priceNum, pricePrecision)}
+	<div class="flex size-full grow flex-col pb-8 lg:flex-row">
+		<!-- Side information panel -->
+		<div
+			use:animatePanel
+			class="flex w-full shrink-0 flex-col p-4 opacity-0 lg:w-[400px] xl:w-[450px]"
+		>
+			<div
+				class="crosshair-corners crosshair-container bg-background/80 flex h-full flex-col backdrop-blur-sm"
+			>
+				<div class="panel-border-b flex flex-col gap-y-6 p-6">
+					<!-- Name, symbol and mc rank -->
+					<div class="flex cursor-default items-baseline gap-x-3 select-none">
+						<h1 class="val-technical text-3xl font-bold uppercase">{coin.name}</h1>
+						<h2 class="lbl-technical">{coin.symbol}</h2>
+						<span
+							class="border-border text-foreground bg-muted/10 ml-auto border px-2 py-0.5 text-[0.7125rem] font-medium tracking-widest uppercase"
+						>
+							Rank {coin.cmcRank}
+						</span>
+					</div>
+
+					<div class="flex flex-wrap items-center gap-6">
+						<div class="text-foreground text-4xl font-medium tracking-tight">
+							{#if priceNum === 0}
+								<TextMorph text={animatedPrice} />
+							{:else}
+								{formatPrice(priceNum, pricePrecision)}
+							{/if}
+						</div>
+						{#if coin.percentChange24h}
+							<div
+								class={`val-technical inline-flex items-center gap-1 font-medium ${parseFloat(coin.percentChange24h) >= 0 ? 'text-chart-2' : 'text-chart-3'}`}
+							>
+								{parseFloat(coin.percentChange24h) >= 0 ? '▲' : '▼'}
+								{Math.abs(parseFloat(coin.percentChange24h)).toFixed(2)}% (24H)
+							</div>
 						{/if}
 					</div>
-					{#if coin.percentChange24h}
-						<span
-							class={`text-xs ${parseFloat(coin.percentChange24h) >= 0 ? 'text-green-600' : 'text-red-600'}`}
-						>
-							{parseFloat(coin.percentChange24h) >= 0 ? '▲' : '▼'}
-							{Math.abs(parseFloat(coin.percentChange24h)).toFixed(2)}% (24h)
-						</span>
-					{/if}
 				</div>
 
-				<div class="border-border grid grid-cols-1 grid-rows-3 gap-0 border">
+				<div class="grid grid-cols-2">
 					<!-- Market Cap -->
-					<div class="bg-card border-border border-r border-b p-3">
-						<div class="text-muted-foreground text-xs tracking-wider uppercase">Market Cap</div>
-						<div class="text-lg">
-							{formatSupply(coin.marketCap)}
-						</div>
+					<div class="panel-border-b panel-border-r p-4">
+						<div class="lbl-technical mb-2 cursor-default select-none">Market Cap</div>
+						<div class="val-technical font-medium">{formatSupply(coin.marketCap)}</div>
 					</div>
 
 					<!-- Volume (24h) -->
-					<div class="bg-card border-border border-b p-3">
-						<div class="text-muted-foreground text-xs tracking-wider uppercase">Volume (24h)</div>
-						<div class="text-lg">
-							{formatSupply(coin.volume24h)}
-						</div>
+					<div class="panel-border-b p-4">
+						<div class="lbl-technical mb-2 cursor-default select-none">Volume (24h)</div>
+						<div class="val-technical font-medium">{formatSupply(coin.volume24h)}</div>
 					</div>
 
 					<!-- Total supply -->
-					<div class="bg-card border-border border-r border-b p-3">
-						<div class="text-muted-foreground text-xs tracking-wider uppercase">Total supply</div>
-						<div class="text-lg">
+					<div class="panel-border-b panel-border-r p-4">
+						<div class="lbl-technical mb-2 cursor-default select-none">Total supply</div>
+						<div class="val-technical font-medium">
 							{formatSupply(coin.circulatingSupply)}
-							{coin.symbol}
+							<span class="text-muted-foreground ml-1 text-[13px]">{coin.symbol}</span>
 						</div>
 					</div>
 
 					<!-- Max supply -->
-					<div class="bg-card border-border border-b p-3">
-						<div class="text-muted-foreground text-xs tracking-wider uppercase">Max. supply</div>
-						<div class="text-lg">
+					<div class="panel-border-b p-4">
+						<div class="lbl-technical mb-2 cursor-default select-none">Max. supply</div>
+						<div class="val-technical font-medium">
 							{formatSupply(coin.maxSupply)}
-							{coin.symbol}
+							<span class="text-muted-foreground ml-1 text-[13px]">{coin.symbol}</span>
 						</div>
 					</div>
 
 					<!-- Date added -->
-					<div class="bg-card border-border border-r p-3">
-						<div class="text-muted-foreground text-xs tracking-wider uppercase">Date added</div>
-						<div class="text-lg">
-							{new Date(coin.dateAdded).toLocaleDateString('en-US', {
-								year: 'numeric',
-								month: 'short'
-							})}
+					<div class="panel-border-r p-4">
+						<div class="lbl-technical mb-2 cursor-default select-none">Listing Date</div>
+						<div class="val-technical font-medium">
+							{new Date(coin.dateAdded)
+								.toLocaleDateString('en-US', {
+									year: 'numeric',
+									month: 'short',
+									day: 'numeric'
+								})
+								.toUpperCase()}
 						</div>
 					</div>
 
 					<!-- % change 90d -->
-					<div class="bg-card p-3">
-						<div class="text-muted-foreground text-xs tracking-wider uppercase">
-							Percent change (90d)
-						</div>
-						<div class="text-lg">
-							<span class={percentChange90d >= 0 ? 'text-green-600' : 'text-red-600'}>
-								{percentChange90d >= 0 ? '▲' : '▼'}
-								{Math.abs(percentChange90d).toFixed(2)}%
+					<div class="p-4">
+						<div class="lbl-technical mb-2 cursor-default select-none">Change (90d)</div>
+						<div class="val-technical font-medium">
+							<span class={percentChange90d >= 0 ? 'text-chart-2' : 'text-chart-3'}>
+								{percentChange90d >= 0 ? '+' : ''}{percentChange90d.toFixed(2)}%
 							</span>
 						</div>
 					</div>
@@ -237,82 +257,100 @@
 		</div>
 
 		<!-- Graph panel -->
-		<div use:animateChart class="flex size-full grow p-2">
-			<Card.Root class="w-full">
-				<Card.Header>
-					<Card.Title>{coin.name} Price</Card.Title>
-					<Card.Description>Last 30D price history</Card.Description>
-				</Card.Header>
-				<Card.Content>
-					<div class="h-[200px] w-full md:h-[350px] lg:h-[500px]">
-						<Chart.Container
-							config={{
-								value: { label: 'Price', color: 'var(--chart-1)' }
-							}}
-							class="h-full w-full"
+		<div use:animateChart class="flex w-full flex-col p-4 opacity-0 lg:flex-1 lg:pl-0">
+			<div
+				class="crosshair-corners crosshair-container bg-background/80 flex size-full grow flex-col backdrop-blur-sm"
+			>
+				<div class="panel-border-b flex items-end justify-between p-6">
+					<div>
+						<h2 class="lbl-technical mb-1 cursor-default select-none">{coin.name} / USD</h2>
+						<div
+							class="text-foreground cursor-default text-[15px] font-medium tracking-widest uppercase select-none"
 						>
-							<AreaChart
-								data={chartData}
-								x="date"
-								xScale={scaleUtc()}
-								yDomain={[yMin, yMax]}
-								yNice
-								padding={{ top: 10, bottom: 30, left: 0, right: 0 }}
-								series={[
-									{
-										key: 'value',
-										label: 'Price',
-										color: 'var(--color-primary)'
-									}
-								]}
-								props={{
-									area: {
-										curve: curveMonotoneX,
-										'fill-opacity': 0.4,
-										motion: 'tween'
-									},
-									xAxis: {
-										format: (v: Date) =>
-											v.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-									},
-									yAxis: {
-										format: () => ''
-									}
-								}}
-							>
-								{#snippet tooltip()}
-									<Chart.Tooltip
-										indicator="line"
-										labelFormatter={(v: Date) =>
-											v.toLocaleDateString('en-US', {
-												month: 'long',
-												day: 'numeric',
-												year: 'numeric',
-												hour: '2-digit',
-												minute: '2-digit'
-											})}
-									/>
-								{/snippet}
-								{#snippet marks({ series, getAreaProps })}
-									{#each series as s, i (s.key)}
-										<LinearGradient
-											stops={[
-												'var(--color-primary)',
-												'color-mix(in lch, var(--color-primary) 10%, transparent)'
-											]}
-											vertical
-										>
-											{#snippet children({ gradient })}
-												<Area {...getAreaProps(s, i)} fill={gradient} />
-											{/snippet}
-										</LinearGradient>
-									{/each}
-								{/snippet}
-							</AreaChart>
-						</Chart.Container>
+							Last 30D Price Action
+						</div>
 					</div>
-				</Card.Content>
-			</Card.Root>
+				</div>
+				<div class="min-h-[300px] flex-grow p-6 md:min-h-[500px]">
+					<Chart.Container
+						config={{
+							value: { label: 'Price', color: 'var(--foreground)' }
+						}}
+						class="h-full w-full"
+					>
+						<AreaChart
+							data={chartData}
+							x="date"
+							xScale={scaleUtc()}
+							yDomain={[yMin, yMax]}
+							yNice
+							grid={{ x: true, y: true }}
+							series={[
+								{
+									key: 'value',
+									label: 'Price',
+									color: 'var(--foreground)'
+								}
+							]}
+							props={{
+								area: {
+									curve: curveMonotoneX,
+									'fill-opacity': 0.15,
+									motion: 'tween',
+									strokeWidth: 2
+								},
+								grid: {
+									class: 'stroke-border stroke-dasharray-[2,2] stroke-opacity-50'
+								},
+								xAxis: {
+									tickLength: 4,
+									ticks: 6,
+									classes: {
+										tickLabel: 'text-[0.6rem] uppercase tracking-widest fill-muted-foreground'
+									}
+								},
+								yAxis: {
+									format: () => '',
+									tickLength: 4,
+									ticks: 5,
+									classes: {
+										tickLabel: 'text-[0.6rem] uppercase tracking-widest fill-muted-foreground'
+									}
+								}
+							}}
+						>
+							{#snippet tooltip()}
+								<Chart.Tooltip
+									indicator="line"
+									class="border-border bg-background rounded-none font-mono text-[13px] tracking-wider uppercase shadow-none"
+									labelFormatter={(v: Date) =>
+										v.toLocaleDateString('en-US', {
+											month: 'short',
+											day: 'numeric',
+											hour: '2-digit',
+											minute: '2-digit'
+										})}
+								/>
+							{/snippet}
+							{#snippet marks({ series, getAreaProps })}
+								{#each series as s, i (s.key)}
+									<LinearGradient
+										stops={[
+											'var(--foreground)',
+											'color-mix(in lch, var(--background) 100%, transparent)'
+										]}
+										vertical
+									>
+										{#snippet children({ gradient })}
+											<Area {...getAreaProps(s, i)} fill={gradient} />
+										{/snippet}
+									</LinearGradient>
+								{/each}
+							{/snippet}
+						</AreaChart>
+					</Chart.Container>
+				</div>
+			</div>
 		</div>
 	</div>
 {/if}

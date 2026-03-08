@@ -8,69 +8,97 @@
 </script>
 
 <div
-	class="border-muted bg-background/80 sticky top-0 z-50 flex w-full items-center justify-between border-b py-4 backdrop-blur-md"
+	class="border-border bg-background/95 supports-[backdrop-filter]:bg-background/80 sticky top-0 z-50 flex w-full items-center justify-between border-b px-4 py-3 backdrop-blur-md"
 >
-	<div class="flex items-center px-4">
+	<div class="flex items-center">
 		<a href={resolve('/')} class="flex items-center pr-8">
-			<p class="text-xl font-medium">CR Tracker</p>
+			<span
+				class="bg-foreground text-background mr-2 px-1.5 py-0.5 text-xs font-bold tracking-widest uppercase"
+				>CR</span
+			>
+			<p class="text-sm font-bold tracking-widest uppercase">Tracker</p>
 		</a>
 
-		<nav class="flex gap-x-6">
-			<a href={resolve('/')} class="hover:text-primary text-sm font-medium transition-colors">
+		<nav class="hidden gap-x-6 md:flex">
+			<a
+				href={resolve('/')}
+				class="text-muted-foreground hover:text-foreground text-xs font-medium tracking-[0.15em] uppercase transition-colors"
+			>
 				Cryptocurrencies
 			</a>
-			<a href={resolve('/')} class="hover:text-primary text-sm font-medium transition-colors">
+			<a
+				href={resolve('/')}
+				class="text-muted-foreground hover:text-foreground text-xs font-medium tracking-[0.15em] uppercase transition-colors"
+			>
 				DexScan
 			</a>
-			<a href={resolve('/')} class="hover:text-primary text-sm font-medium transition-colors">
+			<a
+				href={resolve('/')}
+				class="text-muted-foreground hover:text-foreground text-xs font-medium tracking-[0.15em] uppercase transition-colors"
+			>
 				Exchanges
 			</a>
-			<a href={resolve('/')} class="hover:text-primary text-sm font-medium transition-colors">
+			<a
+				href={resolve('/')}
+				class="text-muted-foreground hover:text-foreground text-xs font-medium tracking-[0.15em] uppercase transition-colors"
+			>
 				Community
 			</a>
-			<a href={resolve('/')} class="hover:text-primary text-sm font-medium transition-colors">
+			<a
+				href={resolve('/')}
+				class="text-muted-foreground hover:text-foreground text-xs font-medium tracking-[0.15em] uppercase transition-colors"
+			>
 				Products
 			</a>
 		</nav>
 	</div>
 
-	<div class="flex justify-center">
-		<div>
-			<Button variant="outline" class="border-border w-64 justify-between rounded-none">
-				<div class="flex items-center">
-					<Search class="-ms-1 me-2 opacity-60" size={16} strokeWidth={2} aria-hidden="true" />
-					Search
-				</div>
-				<kbd
-					class="border-border text-muted-foreground/70 ms-3 -me-1 inline-flex size-5 max-h-full items-center justify-center border px-1 font-[inherit] text-[0.625rem] font-medium"
+	<div class="flex items-center gap-2">
+		<Button
+			variant="outline"
+			size="sm"
+			class="border-border text-muted-foreground hidden h-8 w-64 justify-between rounded-none md:flex"
+		>
+			<div class="flex items-center text-xs tracking-widest uppercase">
+				<Search class="-ms-1 me-2" size={14} strokeWidth={2} aria-hidden="true" />
+				Search
+			</div>
+			<kbd
+				class="border-border bg-muted inline-flex h-5 items-center justify-center border px-1.5 font-[inherit] text-[0.6rem] font-medium"
+			>
+				/
+			</kbd>
+		</Button>
+		<DropdownMenu.Root>
+			<DropdownMenu.Trigger
+				class={buttonVariants({
+					variant: 'outline',
+					size: 'icon',
+					class: 'border-border h-8 w-8 rounded-none'
+				})}
+			>
+				<Sun
+					class="h-[1rem] w-[1rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90"
+				/>
+				<Moon
+					class="absolute h-[1rem] w-[1rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0"
+				/>
+				<span class="sr-only">Toggle theme</span>
+			</DropdownMenu.Trigger>
+			<DropdownMenu.Content align="end" class="border-border rounded-none">
+				<DropdownMenu.Item
+					class="rounded-none text-xs tracking-wider uppercase"
+					onclick={() => setMode('light')}>Light</DropdownMenu.Item
 				>
-					/
-				</kbd>
-			</Button>
-		</div>
-		<div class="px-4">
-			<DropdownMenu.Root>
-				<DropdownMenu.Trigger
-					class={buttonVariants({
-						variant: 'outline',
-						size: 'icon',
-						class: 'border-border rounded-none'
-					})}
+				<DropdownMenu.Item
+					class="rounded-none text-xs tracking-wider uppercase"
+					onclick={() => setMode('dark')}>Dark</DropdownMenu.Item
 				>
-					<Sun
-						class="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90"
-					/>
-					<Moon
-						class="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0"
-					/>
-					<span class="sr-only">Toggle theme</span>
-				</DropdownMenu.Trigger>
-				<DropdownMenu.Content align="end">
-					<DropdownMenu.Item onclick={() => setMode('light')}>Light</DropdownMenu.Item>
-					<DropdownMenu.Item onclick={() => setMode('dark')}>Dark</DropdownMenu.Item>
-					<DropdownMenu.Item onclick={() => resetMode()}>System</DropdownMenu.Item>
-				</DropdownMenu.Content>
-			</DropdownMenu.Root>
-		</div>
+				<DropdownMenu.Item
+					class="rounded-none text-xs tracking-wider uppercase"
+					onclick={() => resetMode()}>System</DropdownMenu.Item
+				>
+			</DropdownMenu.Content>
+		</DropdownMenu.Root>
 	</div>
 </div>
