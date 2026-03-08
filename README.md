@@ -1,82 +1,56 @@
 # Cryptocurrency Tracker
 
-A modern cryptocurrency tracking dashboard built with **SvelteKit**, **Svelte 5**, **TypeScript**, **PostgreSQL**, **Tailwind v4**, and **shadcn‑svelte**.  
-The application fetches near real‑time market data from the **CoinMarketCap API** and presents it using a clean, responsive UI inspired by CoinMarketCap’s design language.
+![Showcase](docs/showcase.gif)
 
-This project was created as part of a **design course** at my school, focusing on modern UI/UX principles, data visualization, and frontend architecture.
+A lightweight, self-hosted cryptocurrency tracker built with SvelteKit. It pulls market data from the CoinMarketCap API and caches it in PostgreSQL to avoid rate limits.
+
+I built this for a UI design class at school. The goal was to recreate the CoinMarketCap user experience, but with my own take on the interface design. It uses Svelte 5 for the frontend and handles routing and API calls on the server.
 
 ## Features
 
-- Real‑time cryptocurrency prices & market data
-- Individual coin detail pages with price history
-- Responsive UI using shadcn‑svelte components
-- Interactive charts powered by LayerChart/shadcn-svelte
-- PostgreSQL persistence layer
-- Fully typed with TypeScript
-- SvelteKit server endpoints for secure API routing
+- Tracks current prices, market cap, and trading volume
+- Individual coin pages with historical price charts
+- Clean interface built with Tailwind v4, shadcn-svelte and motion.dev
+- PostgreSQL database to cache API responses
+- Written entirely in TypeScript
 
-## Preview
+## Setup
 
-### Overview
+You need Node.js and Docker installed on your machine. You will also need a free API key from CoinMarketCap.
 
-![Overview](docs/overview.png)
-
-### Coin View
-
-![Coin view](docs/coin_view.png)
-
-## Getting Started
-
-### 1. Install dependencies
+1. Install the dependencies:
 
 ```bash
 npm install
 ```
 
-### 2. Set up PostgreSQL
-
-Start the local DB container:
+2. Start the local database container and push the schema:
 
 ```bash
 npm run db:start
-```
-
-Push schema:
-
-```bash
 npm run db:push
 ```
 
-### 3. Run in development mode
+3. Start the dev server:
 
 ```bash
 npm run dev
 ```
 
-The app will launch at:
+The app runs at `http://localhost:5173`.
 
-```
-http://localhost:5173
-```
+## Deployment
 
-## Building for Production
+To deploy to production, build the app first:
 
 ```bash
 npm run build
 ```
 
-The production server output will be located in:
-
-```
-build/
-```
-
-## Deploying
-
-You can run the built app using **PM2**, **Nginx**, **Docker**, or any modern Node environment:
+This generates a Node server in the `build/` directory. You can run it directly:
 
 ```bash
 node build/index.js
 ```
 
-For long‑running deployments, PM2 is recommended.
+I usually run this behind an Nginx reverse proxy using PM2 to keep the Node process alive.
