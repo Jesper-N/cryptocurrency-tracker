@@ -1,3 +1,4 @@
+import type { CoinsResponse } from '../lib/coin-types.js';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ fetch }) => {
@@ -5,10 +6,10 @@ export const load: PageServerLoad = async ({ fetch }) => {
 		const response = await fetch('/api/currencies');
 
 		if (!response.ok) {
-			throw new Error(`API returned ${response.status}`);
+			throw new Error(`API returned ${String(response.status)}`);
 		}
 
-		const data = await response.json();
+		const data = (await response.json()) as CoinsResponse;
 
 		return {
 			coins: data.coins

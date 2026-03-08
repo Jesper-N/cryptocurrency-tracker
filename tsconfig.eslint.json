@@ -1,0 +1,13 @@
+{
+	"extends": "./tsconfig.json",
+	"include": [
+		"drizzle.config.ts",
+		"postcss.config.js",
+		"scripts/**/*.mjs",
+		"src/**/*.js",
+		"src/**/*.svelte",
+		"src/**/*.ts",
+		"svelte.config.js",
+		"vite.config.ts"
+	]
+}

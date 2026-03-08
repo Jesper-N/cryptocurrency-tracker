@@ -67,8 +67,7 @@ export const GET: RequestHandler = async () => {
 		// Combine Coin Data with grouped history
 		const coinsWithHistory = topCoinsData.map((coin) => ({
 			...coin,
-			// Get the history for this coin from the map, or an empty array if none found
-			history: historyMap.get(coin.id) || []
+			history: historyMap.get(coin.id) ?? []
 		}));
 
 		return json({

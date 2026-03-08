@@ -1,16 +1,24 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { Chart, Svg, Spline } from 'layerchart';
 	import { scaleTime } from 'd3-scale';
-	import NumberFlow, { continuous } from '@number-flow/svelte';
+	import { TextMorph } from 'torph/svelte';
+	import type { CoinWithHistory, CoinsResponse } from '../lib/coin-types.js';
+	import type { PageData } from './$types';
 
-	const { data } = $props();
+	const { data }: { data: PageData } = $props();
 
-	let coins = $derived(data?.coins || []);
-	let error = $derived<string | null>(data?.error || null);
+	let coins = $state<CoinWithHistory[]>([]);
+	let error = $state<string | null>(null);
+
+	$effect(() => {
+		coins = data.coins;
+		error = data.error ?? null;
+	});
 
 	// --- Helper Function ---
 	function safeParseFloat(value: string | number | null | undefined): number {
@@ -22,7 +30,7 @@
 	// --- Formatting functions for the main table ---
 
 	// Formats percentages with 2 decimals and a % sign
-	function formatPercentage(value: string | number | null): string {
+	function formatPercentage(value: string | number | null | undefined): string {
 		if (value === null || value === undefined) return '0.00%';
 		const num = parseFloat(value.toString());
 		if (isNaN(num)) return '0.00%';
@@ -30,7 +38,7 @@
 	}
 
 	// Formats large currency values (like Market Cap, Volume) without decimals
-	function formatLargeCurrency(value: string | number | null): string {
+	function formatLargeCurrency(value: string | number | null | undefined): string {
 		if (value === null || value === undefined) return '$0';
 		const num = parseFloat(value.toString());
 		if (isNaN(num)) return '$0';
@@ -39,7 +47,7 @@
 	}
 
 	// Formats circulating supply with abbreviations (M, B, T)
-	function formatSupply(value: string | number | null): string {
+	function formatSupply(value: string | number | null | undefined): string {
 		if (value === null || value === undefined) return '0';
 		const num = parseFloat(value.toString());
 		if (isNaN(num)) return '0';
@@ -73,13 +81,13 @@
 	// Format coin history data so it works with the chart library
 	function prepareChartData(
 		history: { timestamp: string | Date; price: string | number }[] | undefined
-	) {
+	): { date: Date; value: number }[] {
 		if (!history || history.length < 2) {
 			return [];
 		}
 		return history.map((entry) => ({
 			date: new Date(entry.timestamp),
-			value: parseFloat(entry.price?.toString() || '0')
+			value: parseFloat(entry.price.toString())
 		}));
 	}
 
@@ -91,13 +99,15 @@
 
 			if (!response.ok) {
 				const errorData = await response.json().catch(() => ({}));
-				throw new Error(errorData?.error || `API returned ${response.status}`);
+				throw new Error(
+					(errorData as { error?: string }).error ?? `API returned ${String(response.status)}`
+				);
 			}
 
-			const data = await response.json();
+			const data = (await response.json()) as CoinsResponse;
 
 			coins = data.coins;
-			error = null; // Clear error on success
+			error = null;
 		} catch (err: unknown) {
 			console.error('Error fetching coin data:', err);
 			if (err instanceof Error) {
@@ -111,19 +121,12 @@
 	// Fetch data every 30 seconds
 	$effect(() => {
 		const timer = setInterval(() => {
-			fetchCoins();
+			void fetchCoins();
 		}, 30000);
 
 		// Cleanup function
 		return () => clearInterval(timer);
 	});
-
-	// Format for compact notation
-	const compactFormat = {
-		notation: 'compact',
-		compactDisplay: 'short',
-		roundingMode: 'trunc'
-	};
 </script>
 
 <div class="mt-8 flex flex-col gap-y-4">
@@ -138,10 +141,10 @@
 						title: 'Highest 24-Hour Volume Change',
 						getData: () =>
 							[...coins]
-								.filter(
-									(coin) => coin.volumeChange24h !== null && coin.volumeChange24h !== undefined
+								.filter((coin) => coin.volumeChange24h !== null)
+								.sort(
+									(a, b) => safeParseFloat(b.volumeChange24h) - safeParseFloat(a.volumeChange24h)
 								)
-								.sort((a, b) => parseFloat(b.volumeChange24h) - parseFloat(a.volumeChange24h))
 								.slice(0, 5),
 						getMetricValue: (coin: (typeof coins)[0]) => safeParseFloat(coin.volumeChange24h),
 						isPositive: true
@@ -152,11 +155,11 @@
 							[...coins]
 								.filter(
 									(coin) =>
-										coin.percentChange30d !== null &&
-										coin.percentChange30d !== undefined &&
-										parseFloat(coin.percentChange30d) > 0.05
+										coin.percentChange30d !== null && safeParseFloat(coin.percentChange30d) > 0.05
 								)
-								.sort((a, b) => parseFloat(b.percentChange30d) - parseFloat(a.percentChange30d))
+								.sort(
+									(a, b) => safeParseFloat(b.percentChange30d) - safeParseFloat(a.percentChange30d)
+								)
 								.slice(0, 5),
 						getMetricValue: (coin: (typeof coins)[0]) => safeParseFloat(coin.percentChange30d),
 						isPositive: true
@@ -165,11 +168,10 @@
 						title: 'Worst 30-Day Performers',
 						getData: () =>
 							[...coins]
-								.filter(
-									(coin) => coin.percentChange30d !== null && coin.percentChange30d !== undefined
-									// Remove the condition that requires negative change
+								.filter((coin) => coin.percentChange30d !== null)
+								.sort(
+									(a, b) => safeParseFloat(a.percentChange30d) - safeParseFloat(b.percentChange30d)
 								)
-								.sort((a, b) => parseFloat(a.percentChange30d) - parseFloat(b.percentChange30d))
 								.slice(0, 5),
 						getMetricValue: (coin: (typeof coins)[0]) =>
 							Math.abs(safeParseFloat(coin.percentChange30d)),
@@ -177,7 +179,7 @@
 					}
 				] as const}
 
-				{#each cardConfigs as config}
+				{#each cardConfigs as config (config.title)}
 					{@const cardData = config.getData()}
 					<Card.Root class="overflow-hidden">
 						<Card.Header class="pb-2">
@@ -185,16 +187,20 @@
 						</Card.Header>
 						<Card.Content class="pt-0">
 							<div class="space-y-4">
-								{#each cardData as coin, i}
+								{#each cardData as coin, i (coin.id)}
 									{@const priceNum = safeParseFloat(coin.currentPrice)}
 									{@const isVerySmallPrice = priceNum > 0 && priceNum < 0.0001}
 									{@const pricePrecision = isVerySmallPrice ? 8 : priceNum < 1 ? 4 : 2}
 									{@const metricValue = config.getMetricValue(coin)}
+									{@const animatedPrice = isVerySmallPrice
+										? `$${priceNum.toFixed(pricePrecision)}`
+										: formatPrice(priceNum, pricePrecision)}
+									{@const animatedMetric = `${metricValue.toFixed(2)}%`}
 									<div class="flex items-center justify-between">
 										<div class="flex items-center gap-3">
 											<span class="text-muted-foreground w-6 text-lg">{i + 1}</span>
 											<a
-												href={`/currencies/${coin.slug}`}
+												href={resolve(`/currencies/${coin.slug}`)}
 												class="flex items-center gap-1 hover:underline"
 											>
 												<span class="font-semibold">{coin.name}</span>
@@ -204,36 +210,15 @@
 										<div class="text-right">
 											<div class="font-semibold">
 												{#if i === 0}
-													<!-- Only use NumberFlow for the first item in each card -->
-													{#if isVerySmallPrice}
-														${priceNum.toFixed(pricePrecision)}
-													{:else}
-														<NumberFlow
-															willChange
-															plugins={[continuous]}
-															value={priceNum}
-															precision={pricePrecision}
-															localeString={priceNum >= 1000}
-															prefix="$"
-															fixedDecimals={true}
-														/>
-													{/if}
+													<TextMorph text={animatedPrice} />
 												{:else}
-													<!-- Use static formatting for other items -->
 													{formatPrice(priceNum, pricePrecision)}
 												{/if}
 											</div>
 											<div class="text-sm {config.isPositive ? 'text-green-600' : 'text-red-600'}">
 												{config.isPositive ? '▲' : '▼'}
 												{#if i === 0}
-													<NumberFlow
-														willChange
-														plugins={[continuous]}
-														value={metricValue}
-														precision={2}
-														suffix="%"
-														fixedDecimals={true}
-													/>
+													<TextMorph text={animatedMetric} />
 												{:else}
 													{metricValue.toFixed(2)}%
 												{/if}
@@ -250,7 +235,7 @@
 	</div>
 
 	<!-- Main Table Card -->
-	{#if coins?.length > 0}
+	{#if coins.length > 0}
 		<Card.Root class="m-4">
 			<Card.Header>
 				<Card.Title>Top Cryptocurrencies by Market Cap</Card.Title>
@@ -292,46 +277,37 @@
 							{@const priceNum = safeParseFloat(coin.currentPrice)}
 							{@const isVerySmallPrice = priceNum > 0 && priceNum < 0.0001}
 							{@const pricePrecision = isVerySmallPrice ? 8 : priceNum < 1 ? 4 : 2}
+							{@const animatedPrice = isVerySmallPrice
+								? `$${priceNum.toFixed(pricePrecision)}`
+								: formatPrice(priceNum, pricePrecision)}
 
 							<Table.Row
 								class="hover:cursor-pointer"
-								onclick={() => goto(`/currencies/${coin.slug}`)}
+								onclick={() => void goto(resolve(`/currencies/${coin.slug}`))}
 							>
 								<Table.Cell class="text-center font-medium">{coin.cmcRank}</Table.Cell>
 								<Table.Cell>
 									{coin.name} <span class="text-muted-foreground">{coin.symbol}</span>
 								</Table.Cell>
 								<Table.Cell class="text-right font-medium">
-									{#if isVerySmallPrice}
-										${priceNum.toFixed(pricePrecision)}
-									{:else}
-										<NumberFlow
-											willChange
-											plugins={[continuous]}
-											value={priceNum}
-											precision={pricePrecision}
-											localeString={priceNum >= 1000}
-											prefix="$"
-											fixedDecimals={true}
-										/>
-									{/if}
+									<TextMorph text={animatedPrice} />
 								</Table.Cell>
 								<Table.Cell
-									class="text-right {parseFloat(coin.percentChange1h) >= 0
+									class="text-right {safeParseFloat(coin.percentChange1h) >= 0
 										? 'text-green-600'
 										: 'text-red-600'}"
 								>
 									{formatPercentage(coin.percentChange1h)}
 								</Table.Cell>
 								<Table.Cell
-									class="text-right {parseFloat(coin.percentChange24h) >= 0
+									class="text-right {safeParseFloat(coin.percentChange24h) >= 0
 										? 'text-green-600'
 										: 'text-red-600'}"
 								>
 									{formatPercentage(coin.percentChange24h)}
 								</Table.Cell>
 								<Table.Cell
-									class="text-right {parseFloat(coin.percentChange7d) >= 0
+									class="text-right {safeParseFloat(coin.percentChange7d) >= 0
 										? 'text-green-600'
 										: 'text-red-600'}"
 								>

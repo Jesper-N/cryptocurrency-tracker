@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { Sun, Moon, Search } from '@lucide/svelte';
 	import { resetMode, setMode } from 'mode-watcher';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
@@ -34,9 +35,9 @@
 	});
 </script>
 
-<div class="flex w-full items-center justify-between border-b border-muted py-4">
+<div class="border-muted flex w-full items-center justify-between border-b py-4">
 	<div class="flex items-center px-4">
-		<a href="/" class="flex items-center pr-8">
+		<a href={resolve('/')} class="flex items-center pr-8">
 			<div
 				class="mr-3 cursor-pointer"
 				aria-label="chart-line"
@@ -64,13 +65,21 @@
 		</a>
 
 		<nav class="flex gap-x-6">
-			<a href="/" class="text-sm font-medium transition-colors hover:text-primary">
+			<a href={resolve('/')} class="hover:text-primary text-sm font-medium transition-colors">
 				Cryptocurrencies
 			</a>
-			<a href="/" class="text-sm font-medium transition-colors hover:text-primary"> DexScan </a>
-			<a href="/" class="text-sm font-medium transition-colors hover:text-primary"> Exchanges </a>
-			<a href="/" class="text-sm font-medium transition-colors hover:text-primary"> Community </a>
-			<a href="/" class="text-sm font-medium transition-colors hover:text-primary"> Products </a>
+			<a href={resolve('/')} class="hover:text-primary text-sm font-medium transition-colors">
+				DexScan
+			</a>
+			<a href={resolve('/')} class="hover:text-primary text-sm font-medium transition-colors">
+				Exchanges
+			</a>
+			<a href={resolve('/')} class="hover:text-primary text-sm font-medium transition-colors">
+				Community
+			</a>
+			<a href={resolve('/')} class="hover:text-primary text-sm font-medium transition-colors">
+				Products
+			</a>
 		</nav>
 	</div>
 
@@ -82,7 +91,7 @@
 					Search
 				</div>
 				<kbd
-					class="-me-1 ms-3 inline-flex size-5 max-h-full items-center justify-center rounded border border-border px-1 font-[inherit] text-[0.625rem] font-medium text-muted-foreground/70"
+					class="border-border text-muted-foreground/70 ms-3 -me-1 inline-flex size-5 max-h-full items-center justify-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium"
 				>
 					/
 				</kbd>
@@ -92,10 +101,10 @@
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger class={buttonVariants({ variant: 'outline', size: 'icon' })}>
 					<Sun
-						class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
+						class="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90"
 					/>
 					<Moon
-						class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
+						class="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0"
 					/>
 					<span class="sr-only">Toggle theme</span>
 				</DropdownMenu.Trigger>

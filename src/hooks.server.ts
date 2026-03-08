@@ -6,9 +6,7 @@ let cmcPollingService: { stop: () => void } | null = null;
 
 export const handle: Handle = async ({ event, resolve }) => {
 	// Initialize the polling service if it's not already running
-	if (!cmcPollingService) {
-		cmcPollingService = initCMCPollingService();
-	}
+	cmcPollingService ??= initCMCPollingService();
 
-	return await resolve(event);
+	return resolve(event);
 };

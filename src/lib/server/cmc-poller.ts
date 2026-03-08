@@ -2,10 +2,9 @@ import ky from 'ky';
 import { db } from '$lib/server/db';
 import { coins, priceHistory } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
-import { env } from '$env/dynamic/private';
+import { CMC_API_KEY } from '$env/static/private';
 import type { CMCApiResponse } from '$lib/types';
 
-const CMC_API_KEY = env.CMC_API_KEY || '';
 const API_URL = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest';
 const FETCH_INTERVAL = 70000;
 const COIN_LIMIT = 30;
@@ -84,7 +83,9 @@ async function updateDatabase(cryptoData: CMCApiResponse): Promise<void> {
 		}
 	}
 
-	console.log(`Updated ${cryptoCoins.length} cryptocurrencies at ${new Date().toISOString()}`);
+	console.log(
+		`Updated ${String(cryptoCoins.length)} cryptocurrencies at ${new Date().toISOString()}`
+	);
 }
 
 // Run a single update cycle
@@ -100,7 +101,7 @@ async function runUpdateCycle(): Promise<void> {
 // Initialize the polling service
 export function initCMCPollingService(): { stop: () => void } {
 	console.log('Starting CMC polling service...');
-	runUpdateCycle();
+	void runUpdateCycle();
 
 	// Set up interval for subsequent updates
 	const intervalId = setInterval(runUpdateCycle, FETCH_INTERVAL);
