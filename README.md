@@ -5,23 +5,24 @@ The application fetches near real‑time market data from the **CoinMarketCap AP
 
 This project was created as part of a **design course** at my school, focusing on modern UI/UX principles, data visualization, and frontend architecture.
 
-
 ## Features
 
-- Real‑time cryptocurrency prices & market data  
-- Individual coin detail pages with price history  
-- Responsive UI using shadcn‑svelte components  
-- Interactive charts powered by LayerChart/shadcn-svelte 
-- PostgreSQL persistence layer  
-- Fully typed with TypeScript  
-- SvelteKit server endpoints for secure API routing  
+- Real‑time cryptocurrency prices & market data
+- Individual coin detail pages with price history
+- Responsive UI using shadcn‑svelte components
+- Interactive charts powered by LayerChart/shadcn-svelte
+- PostgreSQL persistence layer
+- Fully typed with TypeScript
+- SvelteKit server endpoints for secure API routing
 
 ## Preview
 
-### Overview  
+### Overview
+
 ![Overview](docs/overview.png)
 
-### Coin View  
+### Coin View
+
 ![Coin view](docs/coin_view.png)
 
 ## Getting Started

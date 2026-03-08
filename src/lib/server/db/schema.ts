@@ -20,12 +20,12 @@ export const coins = pgTable(
 		marketCap: numeric('market_cap', { precision: 30, scale: 2 }).notNull(),
 
 		// Percent changes
-		percentChange1h: numeric('percent_change_1h', { precision: 10, scale: 8 }),
-		percentChange24h: numeric('percent_change_24h', { precision: 10, scale: 8 }),
-		percentChange7d: numeric('percent_change_7d', { precision: 10, scale: 8 }),
-		percentChange30d: numeric('percent_change_30d', { precision: 10, scale: 8 }),
-		percentChange60d: numeric('percent_change_60d', { precision: 10, scale: 8 }),
-		percentChange90d: numeric('percent_change_90d', { precision: 10, scale: 8 }),
+		percentChange1h: numeric('percent_change_1h', { precision: 20, scale: 8 }),
+		percentChange24h: numeric('percent_change_24h', { precision: 20, scale: 8 }),
+		percentChange7d: numeric('percent_change_7d', { precision: 20, scale: 8 }),
+		percentChange30d: numeric('percent_change_30d', { precision: 20, scale: 8 }),
+		percentChange60d: numeric('percent_change_60d', { precision: 20, scale: 8 }),
+		percentChange90d: numeric('percent_change_90d', { precision: 20, scale: 8 }),
 
 		lastUpdated: timestamp('last_updated').notNull().defaultNow()
 	},
